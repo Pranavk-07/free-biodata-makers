@@ -1,3 +1,30 @@
+
+# Free Biodata Makers
+
+Create beautiful marriage biodata, wedding invitations, birthday cards and puja invitations for free.
+
+## 🚀 Live Demo
+
+[**Visit Free Biodata Makers**](https://free-biodata-makers.pranavkumbhar20042884.workers.dev)
+
+## Features
+
+- Marriage Biodata Maker
+- Wedding Invitation Maker
+- Birthday and Puja Card Maker
+- English, Hindi and Marathi support
+- Multiple templates
+- PDF and PNG downloads
+- Mobile-friendly design
+
+
+
+
+
+
+
+
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
