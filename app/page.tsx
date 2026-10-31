@@ -14,7 +14,7 @@ const tools = [
     description:
       "Design beautiful wedding invitations with your names, date and venue.",
     tag: "Wedding",
-    href: "#",
+    href: "/wedding-invitation",
   },
   {
     icon: "🎂",
