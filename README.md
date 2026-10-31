@@ -1,3 +1,10 @@
+# Free Biodata Makers
+
+Create beautiful Indian marriage biodata, wedding invitations, birthday cards, and puja invitations — completely free.
+
+## 🚀 Live Demo
+
+**[Visit Free Biodata Makers](https://free-biodata-makers.pranavkumbhar20042884.workers.dev)**
 
 ## 📸 Website Screenshots
 
@@ -5,70 +12,66 @@
 ![Homepage](screenshots/homepage.png)
 
 ### Marriage Biodata Maker
-![Biodata Maker](screenshots/biodata-maker.png)
+![Marriage Biodata Maker](screenshots/biodata-maker.png)
 
 ### Wedding Invitation Maker
-![Wedding Invitation](screenshots/wedding-invitation.png)
+![Wedding Invitation Maker](screenshots/wedding-invitation.png)
 
-# Free Biodata Makers
+## ✨ Features
 
-Create beautiful marriage biodata, wedding invitations, birthday cards and puja invitations for free.
-
-## 🚀 Live Demo
-
-[**Visit Free Biodata Makers**](https://free-biodata-makers.pranavkumbhar20042884.workers.dev)
-
-## Features
-
-- Marriage Biodata Maker
+- Marriage Biodata Maker with multiple templates
 - Wedding Invitation Maker
 - Birthday and Puja Card Maker
-- English, Hindi and Marathi support
-- Multiple templates
+- English, Hindi, and Marathi language support
 - PDF and PNG downloads
-- Mobile-friendly design
+- Photo upload and live preview
+- Mobile-friendly responsive design
 
+## 🛠️ Tech Stack
 
+- Next.js
+- React
+- TypeScript
+- Tailwind CSS
+- Cloudflare Workers
+- Vinext
 
+## 💻 Run Locally
 
+Clone the repository:
 
+```bash
+git clone https://github.com/Pranavk-07/free-biodata-makers.git
+```
 
+Navigate into the project:
 
+```bash
+cd free-biodata-makers
+```
 
+Install dependencies:
 
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+```bash
+npm install
+```
 
-## Getting Started
-
-First, run the development server:
+Start the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3000 in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🌐 Deployment
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Deployed using Cloudflare Workers.
 
-## Learn More
+## 📬 Contact
 
-To learn more about Next.js, take a look at the following resources:
+Email: freebiodatamakers@gmail.com
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 📄 License
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+This project is currently maintained by its creator.
