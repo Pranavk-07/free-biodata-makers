@@ -22,7 +22,7 @@ const tools = [
     description:
       "Create birthday, Ganesh puja and other special occasion invitations.",
     tag: "Celebrations",
-    href: "#",
+    href:"/birthday-cards",
   },
 ];
 

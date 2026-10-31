@@ -283,8 +283,18 @@ export default function WeddingInvitationPage() {
   ];
 
   return (
-    <main className="min-h-screen bg-stone-50 px-4 py-8 text-stone-800">
-      <div className="mx-auto max-w-7xl">
+       <main className="min-h-screen bg-stone-50 px-4 py-8 text-stone-800">
+  <div className="mx-auto max-w-7xl">
+
+    <div className="mb-6">
+      <a
+        href="/"
+        className="inline-flex items-center gap-2 rounded-lg border border-stone-300 bg-white px-4 py-2 text-sm font-semibold text-stone-700 transition hover:border-rose-500 hover:text-rose-700"
+      >
+        ← Back to Home
+      </a>
+    </div>
+     
         <header className="mb-8 text-center">
           <h1 className="text-3xl font-bold text-rose-900 sm:text-4xl">
             {t.title}
