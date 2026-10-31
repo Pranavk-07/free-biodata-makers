@@ -10,6 +10,10 @@ const navLinks = [
   { name: "Marriage Biodata", href: "/biodata" },
   { name: "Wedding Invitation", href: "/wedding-invitation" },
   { name: "Birthday & Puja", href: "/birthday-cards" },
+  { name: "About Us", href: "/about" },
+  { name: "Contact Us", href: "/contact" },
+  { name: "Privacy Policy", href: "/privacy-policy" },
+    { name: "Terms & Conditions", href: "/terms" },
 ];
 
 export default function Navbar() {
@@ -106,6 +110,7 @@ export default function Navbar() {
 
               return (
                 <Link
+                   
                   key={link.href}
                   href={link.href}
                   onClick={() => setMenuOpen(false)}
