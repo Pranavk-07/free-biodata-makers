@@ -239,9 +239,11 @@ export default function BiodataMaker() {
   const [language, setLanguage] = useState<Language>("en");
   const [downloading, setDownloading] = useState(false);
   const [previewScale, setPreviewScale] = useState(1);
+  const [contentScale, setContentScale] = useState(1);
 
   const previewRef = useRef<HTMLDivElement>(null);
   const previewContainerRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
 
   const t = translations[language];
   const theme = templates.find((item) => item.id === template) ?? templates[0];
@@ -251,6 +253,7 @@ export default function BiodataMaker() {
       ? "Georgia, serif"
       : "'Noto Sans Devanagari', 'Mangal', sans-serif";
 
+  // Scale the preview to fit the available screen width.
   useEffect(() => {
     const container = previewContainerRef.current;
     if (!container) return;
@@ -262,6 +265,38 @@ export default function BiodataMaker() {
     observer.observe(container);
     return () => observer.disconnect();
   }, []);
+
+  // Automatically fit the biodata content inside the A4 page.
+  useEffect(() => {
+    const content = contentRef.current;
+    if (!content) return;
+
+    let frame = 0;
+
+    const updateScale = () => {
+      cancelAnimationFrame(frame);
+
+      frame = requestAnimationFrame(() => {
+        const contentHeight = content.scrollHeight;
+        const nextScale =
+          contentHeight > 1123 ? 1123 / contentHeight : 1;
+
+        setContentScale((previous) =>
+          Math.abs(previous - nextScale) > 0.001 ? nextScale : previous
+        );
+      });
+    };
+
+    const observer = new ResizeObserver(updateScale);
+    observer.observe(content);
+
+    updateScale();
+
+    return () => {
+      cancelAnimationFrame(frame);
+      observer.disconnect();
+    };
+  }, [data, photo, template, language]);
 
   function updateField(field: keyof Biodata, value: string) {
     setData((previous) => ({ ...previous, [field]: value }));
@@ -415,25 +450,28 @@ export default function BiodataMaker() {
 
   function renderSection(section: { title: string; rows: InfoRow[] }) {
     return (
-      <section key={section.title} className="mt-7">
+      <section key={section.title} className="mt-7 min-w-0 w-full">
         <h3
           className="border-b-2 pb-2 text-base font-bold"
           style={{ borderColor: theme.color, color: theme.color }}
         >
           {section.title}
         </h3>
-        <div className="mt-3 space-y-3">
+
+        <div className="mt-3 min-w-0 space-y-3">
           {section.rows.map(([label, value]) => (
             <div
               key={label}
-              className={`grid gap-2 text-sm ${
+              className={`grid min-w-0 w-full gap-2 text-sm ${
                 template === "modern"
-                  ? "grid-cols-[125px_1fr]"
-                  : "grid-cols-[165px_1fr]"
+                  ? "grid-cols-[minmax(90px,125px)_minmax(0,1fr)]"
+                  : "grid-cols-[minmax(110px,165px)_minmax(0,1fr)]"
               }`}
             >
-              <span className="font-bold">{label}</span>
-              <span className="break-words">{value || t.empty}</span>
+              <span className="min-w-0 break-words font-bold">{label}</span>
+              <span className="min-w-0 max-w-full whitespace-pre-wrap [overflow-wrap:anywhere]">
+                {value || t.empty}
+              </span>
             </div>
           ))}
         </div>
@@ -443,14 +481,14 @@ export default function BiodataMaker() {
 
   function renderAbout() {
     return (
-      <section className="mt-7">
+      <section className="mt-7 min-w-0">
         <h3
           className="border-b-2 pb-2 text-base font-bold"
           style={{ borderColor: theme.color, color: theme.color }}
         >
           {t.aboutHeading}
         </h3>
-        <p className="mt-3 whitespace-pre-wrap break-words text-sm leading-7">
+        <p className="mt-3 break-words whitespace-pre-wrap text-sm leading-7 [overflow-wrap:anywhere]">
           {data.about || t.empty}
         </p>
       </section>
@@ -459,14 +497,14 @@ export default function BiodataMaker() {
 
   function renderPartner() {
     return (
-      <section className="mt-7">
+      <section className="mt-7 min-w-0">
         <h3
           className="border-b-2 pb-2 text-base font-bold"
           style={{ borderColor: theme.color, color: theme.color }}
         >
           {t.partnerHeading}
         </h3>
-        <p className="mt-3 whitespace-pre-wrap break-words text-sm leading-7">
+        <p className="mt-3 break-words whitespace-pre-wrap text-sm leading-7 [overflow-wrap:anywhere]">
           {data.partner || t.empty}
         </p>
       </section>
@@ -485,7 +523,6 @@ export default function BiodataMaker() {
 
   return (
     <main className="min-h-screen bg-[#fffaf5] text-stone-800">
-      {/* Load a font that supports Hindi and Marathi */}
       <link
         rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;600;700;800&display=swap"
@@ -512,7 +549,6 @@ export default function BiodataMaker() {
           </h1>
           <p className="mt-3 text-stone-500">{t.subtitle}</p>
 
-          {/* LANGUAGE SELECTOR */}
           <div className="mx-auto mt-6 max-w-xs text-left">
             <label className="mb-2 block text-sm font-semibold">
               Select Language / भाषा निवडा
@@ -633,7 +669,13 @@ export default function BiodataMaker() {
             </div>
 
             <div ref={previewContainerRef} className="w-full overflow-hidden rounded-xl bg-stone-200 p-3 sm:p-5">
-              <div className="mx-auto" style={{ width: 794 * previewScale, height: 1123 * previewScale }}>
+              <div
+                className="mx-auto"
+                style={{
+                  width: 794 * previewScale,
+                  height: 1123 * previewScale,
+                }}
+              >
                 <div
                   ref={previewRef}
                   className="relative overflow-hidden bg-white"
@@ -646,162 +688,178 @@ export default function BiodataMaker() {
                     fontFamily,
                   }}
                 >
-                  {/* CLASSIC */}
-                  {template === "classic" && (
-                    <div className="h-full p-10" style={{ background: "#fffdf8", border: `12px double ${theme.color}` }}>
-                      <div className="h-full border p-8" style={{ borderColor: "#d5b46a" }}>
-                        <div className="text-center">
-                          <p className="text-xs font-bold uppercase tracking-widest" style={{ color: theme.color }}>{t.aBeautifulJourney}</p>
-                          <h2 className="mt-3 text-3xl font-bold" style={{ color: theme.color }}>{t.marriage}</h2>
-                          <div className="mx-auto mt-5 h-1 w-28 bg-amber-400" />
-                          <p className="mt-3 text-xs text-stone-500">{t.profile}</p>
-                        </div>
-                        <div className="mt-8 flex items-center gap-6">
-                          <div className="min-w-0 flex-1">
-                            <h1 className="break-words text-3xl font-bold" style={{ color: theme.color }}>{data.name || t.yourName}</h1>
-                            <p className="mt-2 text-sm text-stone-500">{t.profileLabel}</p>
+                  {/* This wrapper automatically scales all five templates. */}
+                  <div
+                    ref={contentRef}
+                    style={{
+                      width: 794,
+                      transform: `scale(${contentScale})`,
+                      transformOrigin: "top left",
+                    }}
+                  >
+                    {/* CLASSIC */}
+                    {template === "classic" && (
+                      <div className="h-full p-10" style={{ background: "#fffdf8", border: `12px double ${theme.color}` }}>
+                        <div className="h-full border p-8" style={{ borderColor: "#d5b46a" }}>
+                          <div className="text-center">
+                            <p className="text-xs font-bold uppercase tracking-widest" style={{ color: theme.color }}>{t.aBeautifulJourney}</p>
+                            <h2 className="mt-3 text-3xl font-bold" style={{ color: theme.color }}>{t.marriage}</h2>
+                            <div className="mx-auto mt-5 h-1 w-28 bg-amber-400" />
+                            <p className="mt-3 text-xs text-stone-500">{t.profile}</p>
                           </div>
-                          {renderPhoto("h-32 w-28 shrink-0 border-4 border-white object-cover shadow-md")}
-                        </div>
-                        {renderAbout()}
-                        {previewSections.map(renderSection)}
-                        {renderPartner()}
-                        <div className="mt-8 text-center text-xs text-stone-400">✦ {t.marriage} ✦</div>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* ROYAL */}
-                  {template === "royal" && (
-                    <div className="h-full p-7" style={{ background: "#fbf4e5", border: "12px double #b38a43" }}>
-                      <div className="h-full border-2 p-7" style={{ borderColor: "#d2ad67" }}>
-                        <div className="bg-[#49301d] px-6 py-7 text-center text-white">
-                          <p className="text-xs tracking-widest text-amber-200">{t.presented}</p>
-                          <h2 className="mt-3 text-3xl font-bold text-amber-100">{t.marriage}</h2>
-                          <div className="mx-auto mt-4 h-1 w-24 bg-amber-300" />
-                          <p className="mt-3 text-xs text-amber-100">{t.profile}</p>
-                        </div>
-                        <div className="mt-7 flex items-center gap-6 border-b border-amber-300 pb-6">
-                          <div className="min-w-0 flex-1">
-                            <p className="text-xs font-bold text-amber-800">{t.presented}</p>
-                            <h1 className="mt-3 break-words text-3xl font-bold text-[#67451f]">{data.name || t.yourName}</h1>
-                            <p className="mt-2 text-sm text-amber-800">{t.beginning}</p>
+                          <div className="mt-8 flex items-center gap-6">
+                            <div className="min-w-0 flex-1">
+                              <h1 className="break-words text-3xl font-bold" style={{ color: theme.color }}>{data.name || t.yourName}</h1>
+                              <p className="mt-2 text-sm text-stone-500">{t.profileLabel}</p>
+                            </div>
+                            {renderPhoto("h-32 w-28 shrink-0 border-4 border-white object-cover shadow-md")}
                           </div>
-                          {renderPhoto("h-32 w-28 shrink-0 border-4 border-amber-200 object-cover")}
+                          {renderAbout()}
+                          {previewSections.map(renderSection)}
+                          {renderPartner()}
+                          <div className="mt-8 text-center text-xs text-stone-400">✦ {t.marriage} ✦</div>
                         </div>
-                        <div className="mt-5 rounded-lg border border-amber-200 bg-white/60 px-4 py-1">{renderAbout()}</div>
-                        {previewSections.map(renderSection)}
-                        <div className="mt-5 rounded-lg border border-amber-200 bg-white/60 px-4 py-1">{renderPartner()}</div>
-                        <div className="mt-7 text-center text-sm font-bold text-amber-800">✦ {t.wishes} ✦</div>
                       </div>
-                    </div>
-                  )}
+                    )}
 
-                  {/* MODERN */}
-                  {template === "modern" && (
-                    <div className="flex h-full">
-                      <aside className="flex h-full w-[265px] shrink-0 flex-col px-6 py-10 text-white" style={{ background: "linear-gradient(180deg, #18344f, #24476b, #142b42)" }}>
-                        <div className="text-center">
-                          {renderPhoto("mx-auto h-36 w-32 border-4 border-white/70 object-cover")}
-                          <h1 className="mt-5 break-words text-2xl font-bold">{data.name || t.yourName}</h1>
-                          <p className="mt-2 text-xs text-blue-100">{t.profileLabel}</p>
+                    {/* ROYAL */}
+                    {template === "royal" && (
+                      <div className="h-full p-7" style={{ background: "#fbf4e5", border: "12px double #b38a43" }}>
+                        <div className="h-full border-2 p-7" style={{ borderColor: "#d2ad67" }}>
+                          <div className="bg-[#49301d] px-6 py-7 text-center text-white">
+                            <p className="text-xs tracking-widest text-amber-200">{t.presented}</p>
+                            <h2 className="mt-3 text-3xl font-bold text-amber-100">{t.marriage}</h2>
+                            <div className="mx-auto mt-4 h-1 w-24 bg-amber-300" />
+                            <p className="mt-3 text-xs text-amber-100">{t.profile}</p>
+                          </div>
+                          <div className="mt-7 flex items-center gap-6 border-b border-amber-300 pb-6">
+                            <div className="min-w-0 flex-1">
+                              <p className="text-xs font-bold text-amber-800">{t.presented}</p>
+                              <h1 className="mt-3 break-words text-3xl font-bold text-[#67451f]">{data.name || t.yourName}</h1>
+                              <p className="mt-2 text-sm text-amber-800">{t.beginning}</p>
+                            </div>
+                            {renderPhoto("h-32 w-28 shrink-0 border-4 border-amber-200 object-cover")}
+                          </div>
+                          <div className="mt-5 rounded-lg border border-amber-200 bg-white/60 px-4 py-1">{renderAbout()}</div>
+                          {previewSections.map(renderSection)}
+                          <div className="mt-5 rounded-lg border border-amber-200 bg-white/60 px-4 py-1">{renderPartner()}</div>
+                          <div className="mt-7 text-center text-sm font-bold text-amber-800">✦ {t.wishes} ✦</div>
                         </div>
-                        <div className="mt-10">
-                          <h3 className="border-b border-white/40 pb-2 text-sm font-bold text-blue-100">{t.personal}</h3>
-                          <div className="mt-4 space-y-4 text-sm">
-                            {[
-                              [t.dob, data.dob], [t.height, data.height],
-                              [t.religion, data.religion], [t.caste, data.caste],
-                              [t.motherTongue, data.motherTongue],
-                            ].map(([label, value]) => (
-                              <div key={label}>
-                                <p className="text-xs text-blue-200">{label}</p>
-                                <p className="mt-1 break-words font-semibold">{value || t.empty}</p>
+                      </div>
+                    )}
+
+                    {/* MODERN */}
+                    {template === "modern" && (
+                      <div className="flex h-full">
+                        <aside className="flex h-full w-[265px] shrink-0 flex-col px-6 py-10 text-white" style={{ background: "linear-gradient(180deg, #18344f, #24476b, #142b42)" }}>
+                          <div className="text-center">
+                            {renderPhoto("mx-auto h-36 w-32 border-4 border-white/70 object-cover")}
+                            <h1 className="mt-5 break-words text-2xl font-bold">{data.name || t.yourName}</h1>
+                            <p className="mt-2 text-xs text-blue-100">{t.profileLabel}</p>
+                          </div>
+                          <div className="mt-10">
+                            <h3 className="border-b border-white/40 pb-2 text-sm font-bold text-blue-100">{t.personal}</h3>
+                            <div className="mt-4 space-y-4 text-sm">
+                              {[
+                                [t.dob, data.dob], [t.height, data.height],
+                                [t.religion, data.religion], [t.caste, data.caste],
+                                [t.motherTongue, data.motherTongue],
+                              ].map(([label, value]) => (
+                                <div key={label} className="min-w-0">
+                                  <p className="text-xs text-blue-200">{label}</p>
+                                  <p className="mt-1 break-words font-semibold [overflow-wrap:anywhere]">{value || t.empty}</p>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                          <div className="mt-10">
+                            <h3 className="border-b border-white/40 pb-2 text-sm font-bold text-blue-100">{t.contact}</h3>
+                            <div className="mt-4 min-w-0 space-y-4 text-sm">
+                              <div className="min-w-0">
+                                <p className="text-xs text-blue-200">{t.phone}</p>
+                                <p className="mt-1 whitespace-pre-wrap [overflow-wrap:anywhere]">{data.phone || t.empty}</p>
                               </div>
-                            ))}
+                              <div className="min-w-0">
+                                <p className="text-xs text-blue-200">{t.address}</p>
+                                <p className="mt-1 whitespace-pre-wrap [overflow-wrap:anywhere]">{data.address || t.empty}</p>
+                              </div>
+                            </div>
                           </div>
-                        </div>
-                        <div className="mt-10">
-                          <h3 className="border-b border-white/40 pb-2 text-sm font-bold text-blue-100">{t.contact}</h3>
-                          <div className="mt-4 space-y-4 text-sm">
-                            <div><p className="text-xs text-blue-200">{t.phone}</p><p className="mt-1 break-words">{data.phone || t.empty}</p></div>
-                            <div><p className="text-xs text-blue-200">{t.address}</p><p className="mt-1 break-words">{data.address || t.empty}</p></div>
+                          <div className="mt-auto pt-8 text-center text-xs text-blue-200">{t.profile}</div>
+                        </aside>
+                        <div className="min-w-0 flex-1 px-8 py-10">
+                          <div className="border-b-4 border-[#24476b] pb-5">
+                            <p className="text-xs font-bold text-blue-800">{t.introduction}</p>
+                            <h2 className="mt-2 text-3xl font-bold text-[#24476b]">{t.marriage}</h2>
+                            <p className="mt-2 text-xs text-stone-500">{t.aboutFamily}</p>
                           </div>
+                          {renderAbout()}
+                          {renderSection({
+                            title: t.careerHeading,
+                            rows: [[t.educationLabel, data.education], [t.occupation, data.occupation], [t.income, data.income]],
+                          })}
+                          {renderSection({
+                            title: t.familyHeading,
+                            rows: [[t.father, data.fatherName], [t.mother, data.motherName], [t.siblings, data.siblings]],
+                          })}
+                          {renderPartner()}
+                          <div className="mt-8 border-t border-stone-200 pt-4 text-center text-xs text-stone-400">{t.marriage}</div>
                         </div>
-                        <div className="mt-auto pt-8 text-center text-xs text-blue-200">{t.profile}</div>
-                      </aside>
-                      <div className="min-w-0 flex-1 px-8 py-10">
-                        <div className="border-b-4 border-[#24476b] pb-5">
-                          <p className="text-xs font-bold text-blue-800">{t.introduction}</p>
-                          <h2 className="mt-2 text-3xl font-bold text-[#24476b]">{t.marriage}</h2>
-                          <p className="mt-2 text-xs text-stone-500">{t.aboutFamily}</p>
+                      </div>
+                    )}
+
+                    {/* FLORAL */}
+                    {template === "floral" && (
+                      <div className="h-full p-9" style={{ background: "#fff4f7", border: "12px double #d98ba8" }}>
+                        <div className="h-full rounded-[35px] border-2 border-dashed p-7" style={{ borderColor: "#d98ba8" }}>
+                          <div className="text-center">
+                            <p className="text-3xl text-pink-400">❀ ❀ ❀</p>
+                            <h2 className="mt-3 text-3xl font-bold text-[#b34c78]">{t.marriage}</h2>
+                            <p className="mt-2 text-sm text-pink-700">{t.newBeginning}</p>
+                            <p className="mt-3 text-3xl text-pink-400">❀</p>
+                          </div>
+                          <div className="mt-5 flex items-center gap-6 rounded-2xl bg-white p-5 shadow-sm">
+                            <div className="min-w-0 flex-1">
+                              <p className="text-xs font-bold text-pink-500">{t.introducing}</p>
+                              <h1 className="mt-2 break-words text-3xl font-bold text-[#b34c78]">{data.name || t.yourName}</h1>
+                              <p className="mt-2 text-sm text-stone-500">{t.profileLabel}</p>
+                            </div>
+                            {renderPhoto("h-32 w-28 shrink-0 rounded-2xl border-4 border-pink-100 object-cover")}
+                          </div>
+                          <div className="mt-5 rounded-2xl bg-white px-5 py-1 shadow-sm">{renderAbout()}</div>
+                          {previewSections.map((section) => (
+                            <div key={section.title} className="mt-5 rounded-2xl bg-white px-5 py-1 shadow-sm">
+                              {renderSection(section)}
+                            </div>
+                          ))}
+                          <div className="mt-5 rounded-2xl bg-white px-5 py-1 shadow-sm">{renderPartner()}</div>
+                          <div className="mt-7 text-center text-2xl text-pink-400">❀ ✿ ❀</div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* MINIMAL */}
+                    {template === "minimal" && (
+                      <div className="h-full bg-white px-12 py-12">
+                        <div className="flex items-center justify-between border-b-4 border-stone-800 pb-7">
+                          <div className="min-w-0 flex-1 pr-5">
+                            <p className="text-xs font-bold text-stone-500">{t.profile}</p>
+                            <h2 className="mt-3 text-3xl font-bold text-stone-900">{t.marriage}</h2>
+                            <div className="mt-4 h-1 w-16 bg-stone-800" />
+                          </div>
+                          {renderPhoto("h-32 w-28 shrink-0 border border-stone-300 object-cover")}
+                        </div>
+                        <div className="mt-8">
+                          <h1 className="break-words text-3xl font-bold text-stone-900">{data.name || t.yourName}</h1>
+                          <p className="mt-2 text-sm text-stone-500">{t.profileLabel}</p>
                         </div>
                         {renderAbout()}
-                        {renderSection({
-                          title: t.careerHeading,
-                          rows: [[t.educationLabel, data.education], [t.occupation, data.occupation], [t.income, data.income]],
-                        })}
-                        {renderSection({
-                          title: t.familyHeading,
-                          rows: [[t.father, data.fatherName], [t.mother, data.motherName], [t.siblings, data.siblings]],
-                        })}
+                        {previewSections.map(renderSection)}
                         {renderPartner()}
-                        <div className="mt-8 border-t border-stone-200 pt-4 text-center text-xs text-stone-400">{t.marriage}</div>
+                        <div className="mt-10 border-t border-stone-300 pt-5 text-center text-xs text-stone-400">{t.marriage}</div>
                       </div>
-                    </div>
-                  )}
-
-                  {/* FLORAL */}
-                  {template === "floral" && (
-                    <div className="h-full p-9" style={{ background: "#fff4f7", border: "12px double #d98ba8" }}>
-                      <div className="h-full rounded-[35px] border-2 border-dashed p-7" style={{ borderColor: "#d98ba8" }}>
-                        <div className="text-center">
-                          <p className="text-3xl text-pink-400">❀ ❀ ❀</p>
-                          <h2 className="mt-3 text-3xl font-bold text-[#b34c78]">{t.marriage}</h2>
-                          <p className="mt-2 text-sm text-pink-700">{t.newBeginning}</p>
-                          <p className="mt-3 text-3xl text-pink-400">❀</p>
-                        </div>
-                        <div className="mt-5 flex items-center gap-6 rounded-2xl bg-white p-5 shadow-sm">
-                          <div className="min-w-0 flex-1">
-                            <p className="text-xs font-bold text-pink-500">{t.introducing}</p>
-                            <h1 className="mt-2 break-words text-3xl font-bold text-[#b34c78]">{data.name || t.yourName}</h1>
-                            <p className="mt-2 text-sm text-stone-500">{t.profileLabel}</p>
-                          </div>
-                          {renderPhoto("h-32 w-28 shrink-0 rounded-2xl border-4 border-pink-100 object-cover")}
-                        </div>
-                        <div className="mt-5 rounded-2xl bg-white px-5 py-1 shadow-sm">{renderAbout()}</div>
-                        {previewSections.map((section) => (
-                          <div key={section.title} className="mt-5 rounded-2xl bg-white px-5 py-1 shadow-sm">
-                            {renderSection(section)}
-                          </div>
-                        ))}
-                        <div className="mt-5 rounded-2xl bg-white px-5 py-1 shadow-sm">{renderPartner()}</div>
-                        <div className="mt-7 text-center text-2xl text-pink-400">❀ ✿ ❀</div>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* MINIMAL */}
-                  {template === "minimal" && (
-                    <div className="h-full bg-white px-12 py-12">
-                      <div className="flex items-center justify-between border-b-4 border-stone-800 pb-7">
-                        <div className="min-w-0 flex-1 pr-5">
-                          <p className="text-xs font-bold text-stone-500">{t.profile}</p>
-                          <h2 className="mt-3 text-3xl font-bold text-stone-900">{t.marriage}</h2>
-                          <div className="mt-4 h-1 w-16 bg-stone-800" />
-                        </div>
-                        {renderPhoto("h-32 w-28 shrink-0 border border-stone-300 object-cover")}
-                      </div>
-                      <div className="mt-8">
-                        <h1 className="break-words text-3xl font-bold text-stone-900">{data.name || t.yourName}</h1>
-                        <p className="mt-2 text-sm text-stone-500">{t.profileLabel}</p>
-                      </div>
-                      {renderAbout()}
-                      {previewSections.map(renderSection)}
-                      {renderPartner()}
-                      <div className="mt-10 border-t border-stone-300 pt-5 text-center text-xs text-stone-400">{t.marriage}</div>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
