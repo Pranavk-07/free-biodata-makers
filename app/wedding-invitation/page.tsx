@@ -1,4 +1,4 @@
-
+ 
 "use client";
 
 import { useEffect, useRef, useState } from "react";
@@ -179,15 +179,29 @@ export default function WeddingInvitationPage() {
   const t = translations[language];
   const style = templateStyles[template];
 
+  // Responsive preview scaling
   useEffect(() => {
     const container = previewContainerRef.current;
     if (!container) return;
 
-    const observer = new ResizeObserver((entries) => {
-      setPreviewScale(Math.min(1, entries[0].contentRect.width / 794));
-    });
+    const updateScale = () => {
+      const containerWidth = container.clientWidth;
+      const styles = window.getComputedStyle(container);
+
+      const horizontalPadding =
+        parseFloat(styles.paddingLeft) +
+        parseFloat(styles.paddingRight);
+
+      const availableWidth = containerWidth - horizontalPadding;
+
+      setPreviewScale(Math.min(1, Math.max(0.1, availableWidth / 794)));
+    };
+
+    const observer = new ResizeObserver(updateScale);
 
     observer.observe(container);
+    updateScale();
+
     return () => observer.disconnect();
   }, []);
 
@@ -283,34 +297,35 @@ export default function WeddingInvitationPage() {
   ];
 
   return (
-       <main className="min-h-screen bg-stone-50 px-4 py-8 text-stone-800">
-  <div className="mx-auto max-w-7xl">
+    <main className="min-h-screen w-full overflow-x-hidden bg-stone-50 px-3 py-6 text-stone-800 sm:px-4 sm:py-8">
+      <div className="mx-auto w-full max-w-7xl min-w-0">
+        <div className="mb-6">
+          <a
+            href="/"
+            className="inline-flex items-center gap-2 rounded-lg border border-stone-300 bg-white px-4 py-2 text-sm font-semibold text-stone-700 transition hover:border-rose-500 hover:text-rose-700"
+          >
+            ← Back to Home
+          </a>
+        </div>
 
-    <div className="mb-6">
-      <a
-        href="/"
-        className="inline-flex items-center gap-2 rounded-lg border border-stone-300 bg-white px-4 py-2 text-sm font-semibold text-stone-700 transition hover:border-rose-500 hover:text-rose-700"
-      >
-        ← Back to Home
-      </a>
-    </div>
-     
         <header className="mb-8 text-center">
-          <h1 className="text-3xl font-bold text-rose-900 sm:text-4xl">
+          <h1 className="text-2xl font-bold text-rose-900 sm:text-4xl">
             {t.title}
           </h1>
-          <p className="mt-2 text-stone-600">{t.subtitle}</p>
+          <p className="mt-2 text-sm text-stone-600 sm:text-base">
+            {t.subtitle}
+          </p>
         </header>
 
-        <div className="grid gap-8 lg:grid-cols-2">
+        <div className="grid min-w-0 grid-cols-1 gap-8 lg:grid-cols-2">
           {/* Form section */}
-          <section className="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm sm:p-7">
+          <section className="min-w-0 w-full rounded-2xl border border-stone-200 bg-white p-4 shadow-sm sm:p-7">
             <div className="mb-6">
               <label className="mb-2 block font-semibold">{t.language}</label>
               <select
                 value={language}
                 onChange={(e) => setLanguage(e.target.value as Language)}
-                className="w-full rounded-lg border border-stone-300 p-3 outline-none focus:border-rose-600"
+                className="w-full min-w-0 rounded-lg border border-stone-300 p-3 outline-none focus:border-rose-600"
               >
                 <option value="en">English</option>
                 <option value="hi">हिन्दी</option>
@@ -320,11 +335,11 @@ export default function WeddingInvitationPage() {
 
             <h2 className="mb-5 text-xl font-bold">{t.details}</h2>
 
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid min-w-0 gap-4 sm:grid-cols-2">
               {fields.map((field) => (
                 <div
                   key={field.key}
-                  className={field.multiline ? "sm:col-span-2" : ""}
+                  className={`min-w-0 ${field.multiline ? "sm:col-span-2" : ""}`}
                 >
                   <label className="mb-1.5 block text-sm font-medium">
                     {field.label}
@@ -333,20 +348,16 @@ export default function WeddingInvitationPage() {
                   {field.multiline ? (
                     <textarea
                       value={data[field.key]}
-                      onChange={(e) =>
-                        updateField(field.key, e.target.value)
-                      }
+                      onChange={(e) => updateField(field.key, e.target.value)}
                       rows={3}
-                      className="w-full rounded-lg border border-stone-300 p-3 outline-none focus:border-rose-600"
+                      className="w-full min-w-0 rounded-lg border border-stone-300 p-3 outline-none focus:border-rose-600"
                     />
                   ) : (
                     <input
                       type={field.type || "text"}
                       value={data[field.key]}
-                      onChange={(e) =>
-                        updateField(field.key, e.target.value)
-                      }
-                      className="w-full rounded-lg border border-stone-300 p-3 outline-none focus:border-rose-600"
+                      onChange={(e) => updateField(field.key, e.target.value)}
+                      className="w-full min-w-0 rounded-lg border border-stone-300 p-3 outline-none focus:border-rose-600"
                     />
                   )}
                 </div>
@@ -357,37 +368,40 @@ export default function WeddingInvitationPage() {
               <h2 className="mb-4 text-xl font-bold">{t.designs}</h2>
 
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                {(
-                  ["royal", "modern", "floral", "classic"] as Template[]
-                ).map((item) => (
-                  <button
-                    key={item}
-                    onClick={() => setTemplate(item)}
-                    className={`min-h-14 rounded-xl border-2 px-3 py-3 text-center text-sm font-semibold leading-tight transition ${
-                      template === item
-                        ? "border-rose-700 bg-rose-50 text-rose-900"
-                        : "border-stone-200 hover:border-rose-300"
-                    }`}
-                  >
-                    {t.templates[item]}
-                  </button>
-                ))}
+                {(["royal", "modern", "floral", "classic"] as Template[]).map(
+                  (item) => (
+                    <button
+                      key={item}
+                      type="button"
+                      onClick={() => setTemplate(item)}
+                      className={`min-h-14 rounded-xl border-2 px-3 py-3 text-center text-sm font-semibold leading-tight transition ${
+                        template === item
+                          ? "border-rose-700 bg-rose-50 text-rose-900"
+                          : "border-stone-200 hover:border-rose-300"
+                      }`}
+                    >
+                      {t.templates[item]}
+                    </button>
+                  )
+                )}
               </div>
             </div>
 
-            <div className="mt-8 grid gap-3 sm:grid-cols-2">
+            <div className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2">
               <button
+                type="button"
                 onClick={downloadPNG}
                 disabled={loading}
-                className="rounded-xl bg-rose-800 px-5 py-3 font-semibold text-white hover:bg-rose-900 disabled:opacity-60"
+                className="w-full rounded-xl bg-rose-800 px-5 py-3 font-semibold text-white hover:bg-rose-900 disabled:opacity-60"
               >
                 {loading ? t.loading : t.downloadPng}
               </button>
 
               <button
+                type="button"
                 onClick={downloadPDF}
                 disabled={loading}
-                className="rounded-xl bg-stone-800 px-5 py-3 font-semibold text-white hover:bg-stone-900 disabled:opacity-60"
+                className="w-full rounded-xl bg-stone-800 px-5 py-3 font-semibold text-white hover:bg-stone-900 disabled:opacity-60"
               >
                 {loading ? t.loading : t.downloadPdf}
               </button>
@@ -395,12 +409,12 @@ export default function WeddingInvitationPage() {
           </section>
 
           {/* Preview section */}
-          <section>
+          <section className="min-w-0 w-full">
             <h2 className="mb-4 text-xl font-bold">{t.preview}</h2>
 
             <div
               ref={previewContainerRef}
-              className="w-full overflow-hidden rounded-xl bg-stone-200 p-2 sm:p-4"
+              className="w-full min-w-0 overflow-hidden rounded-xl bg-stone-200 p-2 sm:p-4"
             >
               <div
                 className="mx-auto"
@@ -432,48 +446,29 @@ export default function WeddingInvitationPage() {
                       padding: "45px",
                     }}
                   >
-                     
-                     <div
-  style={{
-    color: style.accent,
-    fontSize: "25px",
-    letterSpacing: "5px",
-    marginBottom: "45px",
-    marginTop: "20px",
-  }}
->
-  ✦ ❀ ✦
-</div>
+                    <div
+                      style={{
+                        color: style.accent,
+                        fontSize: "25px",
+                        letterSpacing: "5px",
+                        marginBottom: "45px",
+                        marginTop: "20px",
+                      }}
+                    >
+                      ✦ ❀ ✦
+                    </div>
 
-<p
-  style={{
-    fontSize: "25px",
-    letterSpacing: "2px",
-    marginBottom: "24px",
-    lineHeight: 1.5,
-    padding: "0 10px",
-  }}
->
-  {style.heading}
-</p>
-                     
-                     
-                     
-                     
-                     
-                     
-                     
-                     
-
-                     
-                     
-                     
-                     
-                     
-                     
-                     
-                     
-                     
+                    <p
+                      style={{
+                        fontSize: "25px",
+                        letterSpacing: "2px",
+                        marginBottom: "24px",
+                        lineHeight: 1.5,
+                        padding: "0 10px",
+                      }}
+                    >
+                      {style.heading}
+                    </p>
 
                     <p style={{ fontSize: "23px", marginBottom: "12px" }}>
                       {t.invite}

@@ -1,4 +1,4 @@
-
+ 
 "use client";
 
 import { useEffect, useRef, useState } from "react";
@@ -212,15 +212,29 @@ export default function BirthdayCardsPage() {
     puja: t.pujaSubtitle,
   }[event];
 
+  // Responsive preview scaling
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
 
-    const observer = new ResizeObserver((entries) => {
-      setPreviewScale(Math.min(1, entries[0].contentRect.width / 794));
-    });
+    const updateScale = () => {
+      const containerWidth = container.clientWidth;
+      const styles = window.getComputedStyle(container);
+
+      const horizontalPadding =
+        parseFloat(styles.paddingLeft) +
+        parseFloat(styles.paddingRight);
+
+      const availableWidth = containerWidth - horizontalPadding;
+
+      setPreviewScale(Math.min(1, Math.max(0.1, availableWidth / 794)));
+    };
+
+    const observer = new ResizeObserver(updateScale);
 
     observer.observe(container);
+    updateScale();
+
     return () => observer.disconnect();
   }, []);
 
@@ -315,33 +329,35 @@ export default function BirthdayCardsPage() {
   ];
 
   return (
-        <main className="min-h-screen bg-stone-50 px-4 py-8 text-stone-800">
-  <div className="mx-auto max-w-7xl">
+    <main className="min-h-screen w-full overflow-x-hidden bg-stone-50 px-3 py-6 text-stone-800 sm:px-4 sm:py-8">
+      <div className="mx-auto w-full max-w-7xl min-w-0">
+        <div className="mb-6">
+          <a
+            href="/"
+            className="inline-flex items-center gap-2 rounded-lg border border-stone-300 bg-white px-4 py-2 text-sm font-semibold text-stone-700 transition hover:border-rose-500 hover:text-rose-700"
+          >
+            ← Back to Home
+          </a>
+        </div>
 
-    <div className="mb-6">
-      <a
-        href="/"
-        className="inline-flex items-center gap-2 rounded-lg border border-stone-300 bg-white px-4 py-2 text-sm font-semibold text-stone-700 transition hover:border-rose-500 hover:text-rose-700"
-      >
-        ← Back to Home
-      </a>
-    </div>
-    
         <header className="mb-8 text-center">
-          <h1 className="text-3xl font-bold text-rose-900 sm:text-4xl">
+          <h1 className="text-2xl font-bold text-rose-900 sm:text-4xl">
             {t.title}
           </h1>
-          <p className="mt-2 text-stone-600">{t.subtitle}</p>
+          <p className="mt-2 text-sm text-stone-600 sm:text-base">
+            {t.subtitle}
+          </p>
         </header>
 
-        <div className="grid gap-8 lg:grid-cols-2">
-          <section className="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm sm:p-7">
+        <div className="grid min-w-0 grid-cols-1 gap-8 lg:grid-cols-2">
+          {/* Form section */}
+          <section className="min-w-0 w-full rounded-2xl border border-stone-200 bg-white p-4 shadow-sm sm:p-7">
             <div className="mb-5">
               <label className="mb-2 block font-semibold">{t.language}</label>
               <select
                 value={language}
                 onChange={(e) => setLanguage(e.target.value as Language)}
-                className="w-full rounded-lg border border-stone-300 p-3"
+                className="w-full min-w-0 rounded-lg border border-stone-300 p-3"
               >
                 <option value="en">English</option>
                 <option value="hi">हिन्दी</option>
@@ -354,7 +370,7 @@ export default function BirthdayCardsPage() {
               <select
                 value={event}
                 onChange={(e) => setEvent(e.target.value as EventType)}
-                className="w-full rounded-lg border border-stone-300 p-3"
+                className="w-full min-w-0 rounded-lg border border-stone-300 p-3"
               >
                 <option value="birthday">{t.birthday}</option>
                 <option value="ganesh">{t.ganesh}</option>
@@ -364,11 +380,11 @@ export default function BirthdayCardsPage() {
 
             <h2 className="mb-5 text-xl font-bold">{t.details}</h2>
 
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid min-w-0 gap-4 sm:grid-cols-2">
               {fields.map((field) => (
                 <div
                   key={field.key}
-                  className={field.multiline ? "sm:col-span-2" : ""}
+                  className={`min-w-0 ${field.multiline ? "sm:col-span-2" : ""}`}
                 >
                   <label className="mb-1.5 block text-sm font-medium">
                     {field.label}
@@ -378,20 +394,16 @@ export default function BirthdayCardsPage() {
                     <textarea
                       rows={3}
                       value={data[field.key]}
-                      onChange={(e) =>
-                        updateField(field.key, e.target.value)
-                      }
+                      onChange={(e) => updateField(field.key, e.target.value)}
                       placeholder={t.defaultMessage}
-                      className="w-full rounded-lg border border-stone-300 p-3"
+                      className="w-full min-w-0 rounded-lg border border-stone-300 p-3"
                     />
                   ) : (
                     <input
                       type={field.type || "text"}
                       value={data[field.key]}
-                      onChange={(e) =>
-                        updateField(field.key, e.target.value)
-                      }
-                      className="w-full rounded-lg border border-stone-300 p-3"
+                      onChange={(e) => updateField(field.key, e.target.value)}
+                      className="w-full min-w-0 rounded-lg border border-stone-300 p-3"
                     />
                   )}
                 </div>
@@ -407,6 +419,7 @@ export default function BirthdayCardsPage() {
                 ).map((item) => (
                   <button
                     key={item}
+                    type="button"
                     onClick={() => setDesign(item)}
                     className={`min-h-14 rounded-xl border-2 px-3 py-3 text-center text-sm font-semibold leading-tight ${
                       design === item
@@ -420,31 +433,34 @@ export default function BirthdayCardsPage() {
               </div>
             </div>
 
-            <div className="mt-8 grid gap-3 sm:grid-cols-2">
+            <div className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2">
               <button
+                type="button"
                 onClick={downloadPNG}
                 disabled={loading}
-                className="rounded-xl bg-rose-800 px-5 py-3 font-semibold text-white hover:bg-rose-900 disabled:opacity-60"
+                className="w-full rounded-xl bg-rose-800 px-5 py-3 font-semibold text-white hover:bg-rose-900 disabled:opacity-60"
               >
                 {loading ? t.loading : t.png}
               </button>
 
               <button
+                type="button"
                 onClick={downloadPDF}
                 disabled={loading}
-                className="rounded-xl bg-stone-800 px-5 py-3 font-semibold text-white hover:bg-stone-900 disabled:opacity-60"
+                className="w-full rounded-xl bg-stone-800 px-5 py-3 font-semibold text-white hover:bg-stone-900 disabled:opacity-60"
               >
                 {loading ? t.loading : t.pdf}
               </button>
             </div>
           </section>
 
-          <section>
+          {/* Preview section */}
+          <section className="min-w-0 w-full">
             <h2 className="mb-4 text-xl font-bold">{t.preview}</h2>
 
             <div
               ref={containerRef}
-              className="w-full overflow-hidden rounded-xl bg-stone-200 p-2 sm:p-4"
+              className="w-full min-w-0 overflow-hidden rounded-xl bg-stone-200 p-2 sm:p-4"
             >
               <div
                 className="mx-auto"
