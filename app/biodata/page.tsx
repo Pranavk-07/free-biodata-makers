@@ -1,5 +1,6 @@
 "use client";
 
+import SeoContentSection from "@/app/components/SeoContentSection";
 import {
   useEffect,
   useMemo,
@@ -1337,6 +1338,10 @@ export default function BiodataMaker() {
           </a>
         </div>
       </div>
+
+      {/* Added SEO Content & FAQ Schema Section */}
+      <SeoContentSection />
+
     </main>
   );
 }
