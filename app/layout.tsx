@@ -14,17 +14,26 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+ 
+ 
+ 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://freebiodatamakers.com"),
+
   title: {
-    default: "Free Biodata Makers | Marriage Biodata & Invitation Cards",
+    default: "Free Marriage Biodata Maker & Invitation Cards Online",
     template: "%s | Free Biodata Makers",
   },
+
   description:
-    "Create free marriage biodata, wedding invitations, birthday cards, and puja invitation cards with beautiful templates. Customize and download your designs easily.",
+    "Create free marriage biodata online with beautiful templates. Make wedding invitations, birthday cards, and puja invitation cards. Customize and download easily.",
+
   applicationName: "Free Biodata Makers",
+
   keywords: [
     "free marriage biodata maker",
     "online biodata maker",
+    "marriage biodata format",
     "marriage biodata templates",
     "wedding invitation maker",
     "birthday invitation cards",
@@ -32,19 +41,64 @@ export const metadata: Metadata = {
     "Hindi biodata maker",
     "Marathi biodata maker",
   ],
+
   authors: [{ name: "Free Biodata Makers" }],
+
+   
+   
+   
+
   robots: {
     index: true,
     follow: true,
   },
+
   openGraph: {
+    title: "Free Marriage Biodata Maker & Invitation Cards Online",
+    description:
+      "Create free marriage biodata, wedding invitations, birthday cards, and puja invitation cards.",
+    url: "https://freebiodatamakers.com/",
+    siteName: "Free Biodata Makers",
+    locale: "en_IN",
+    type: "website",
+  },
+
+  twitter: {
+    card: "summary_large_image",
     title: "Free Biodata Makers",
     description:
       "Create beautiful marriage biodata and invitation cards for free.",
-    siteName: "Free Biodata Makers",
-    type: "website",
   },
 };
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
 
 export default function RootLayout({
   children,
