@@ -12,7 +12,7 @@ import { toJpeg, toPng } from "html-to-image";
 import jsPDF from "jspdf";
 
 /* ------------------------------------------------------------------ */
-/* Types and data                                                      */
+/* Types and Data                                                     */
 /* ------------------------------------------------------------------ */
 
 type Language = "en" | "hi" | "mr";
@@ -32,16 +32,6 @@ type InfoRow = [string, string];
 const emptyData = Object.fromEntries(FIELD_KEYS.map((k) => [k, ""])) as Biodata;
 
 type TemplateMeta = { id: string; color: string; serif: boolean; bg?: string };
-
-const templates: TemplateMeta[] = [
-  { id: "classic", color: "#9f343e", serif: true },
-  { id: "royal", color: "#a67c32", serif: true },
-  { id: "modern", color: "#24476b", serif: false },
-  { id: "floral", color: "#c45b83", serif: true },
-  { id: "minimal", color: "#475569", serif: false },
-  { id: "royalTraditional", color: "#d5ad69", serif: true },
-  // Ornate themed templates are appended below from ORNATE_THEMES.
-];
 
 const en = {
   pageTitle: "Marriage Biodata Maker",
@@ -75,21 +65,21 @@ const en = {
   clearConfirm: "Clear all details and the photo?",
   sampleBanner: "Sample preview. Start typing to replace it.",
   fillFirst: "Please fill in your details before downloading.",
-  overflow: "Your content is longer than one page. Shorten the long text or it will be cut off.",
+  overflow: "Your content is longer than one page. Shorten text to fit.",
   select: "Select",
   enter: "Enter",
   fullName: "Full Name",
   dob: "Date of Birth",
-  birthTime: "Birth Time",
-  birthPlace: "Birth Place",
+  birthTime: "Time of Birth",
+  birthPlace: "Place of Birth",
   height: "Height",
-  religion: "Religion",
-  caste: "Caste / Community",
+  religion: "Religion / Caste",
+  caste: "Caste / Sub-Caste",
   motherTongue: "Mother Tongue",
   rashi: "Rashi",
   nakshatra: "Nakshatra",
   gotra: "Gotra",
-  manglik: "Manglik Status",
+  manglik: "Manglik",
   complexion: "Complexion",
   educationLabel: "Education",
   occupation: "Occupation",
@@ -100,16 +90,16 @@ const en = {
   motherOccupation: "Mother's Occupation",
   siblings: "Brothers / Sisters",
   address: "Address",
-  phone: "Mobile Number",
+  phone: "Contact No.",
   religionOptions: ["Hindu", "Muslim", "Christian", "Sikh", "Buddhist", "Jain", "Other"],
-  manglikOptions: ["Yes", "No", "Partial (Anshik)", "Don't know"],
+  manglikOptions: ["No", "Yes", "Partial (Anshik)", "Don't know"],
   aboutHeading: "ABOUT ME",
   partnerHeading: "PARTNER EXPECTATIONS",
-  personalHeading: "PERSONAL INFORMATION",
-  careerHeading: "EDUCATION & CAREER",
-  familyHeading: "FAMILY INFORMATION",
-  contactHeading: "CONTACT INFORMATION",
-  marriage: "Marriage Biodata",
+  personalHeading: "Personal Details",
+  careerHeading: "Education & Career",
+  familyHeading: "Family Details",
+  contactHeading: "Contact Details",
+  marriage: "BIO DATA",
   profile: "Personal & Family Profile",
   yourName: "Your Name",
   profileLabel: "Marriage Profile",
@@ -121,7 +111,7 @@ const en = {
   newBeginning: "A New Beginning, A Beautiful Journey",
   wishes: "WITH BEST WISHES",
   aBeautifulJourney: "A Beautiful Journey Begins",
-  blessing: "|| Shree Ganeshaya Namah ||",
+  blessing: "|| Shree Ganeshaya Namaha ||",
   shubh: "Shubh Mangalam",
   invalidPhoto: "Please select an image file (JPG or PNG).",
   largePhoto: "Please select an image smaller than 10 MB.",
@@ -131,10 +121,10 @@ const en = {
   templateNames: {
     classic: "Classic Traditional",
     royal: "Royal Gold",
-    modern: "Modern Professional",
-    floral: "Floral Elegant",
-    minimal: "Minimal",
-    royalTraditional: "Royal Traditional",
+    modern: "Modern Blue",
+    floral: "Floral Pink",
+    minimal: "Minimal Clean",
+    royalTraditional: "Royal Crimson",
   },
 };
 
@@ -172,7 +162,7 @@ const hi: Translation = {
   clearConfirm: "सारी जानकारी और फोटो हटाएं?",
   sampleBanner: "यह नमूना प्रीव्यू है। टाइप करना शुरू करें।",
   fillFirst: "डाउनलोड से पहले कृपया अपनी जानकारी भरें।",
-  overflow: "आपकी जानकारी एक पेज से ज़्यादा है। लंबा टेक्स्ट छोटा करें, वरना वह कट जाएगा।",
+  overflow: "आपकी जानकारी एक पेज से ज़्यादा है। टेक्स्ट छोटा करें।",
   select: "चुनें",
   enter: "दर्ज करें",
   fullName: "पूरा नाम",
@@ -180,16 +170,16 @@ const hi: Translation = {
   birthTime: "जन्म का समय",
   birthPlace: "जन्म स्थान",
   height: "लंबाई",
-  religion: "धर्म",
-  caste: "जाति / समुदाय",
+  religion: "धर्म / जाति",
+  caste: "जाति / उप-जाति",
   motherTongue: "मातृभाषा",
   rashi: "राशि",
   nakshatra: "नक्षत्र",
   gotra: "गोत्र",
-  manglik: "मांगलिक स्थिति",
+  manglik: "मांगलिक",
   complexion: "रंग",
   educationLabel: "शिक्षा",
-  occupation: "व्यवसाय",
+  occupation: "व्यवसाय / नौकरी",
   income: "वार्षिक आय",
   father: "पिता का नाम",
   fatherOccupation: "पिता का व्यवसाय",
@@ -197,16 +187,16 @@ const hi: Translation = {
   motherOccupation: "माता का व्यवसाय",
   siblings: "भाई / बहन",
   address: "पता",
-  phone: "मोबाइल नंबर",
+  phone: "संपर्क नंबर",
   religionOptions: ["हिंदू", "मुस्लिम", "ईसाई", "सिख", "बौद्ध", "जैन", "अन्य"],
-  manglikOptions: ["हाँ", "नहीं", "आंशिक", "पता नहीं"],
+  manglikOptions: ["नहीं", "हाँ", "आंशिक", "पता नहीं"],
   aboutHeading: "मेरे बारे में",
   partnerHeading: "जीवनसाथी से अपेक्षाएं",
-  personalHeading: "व्यक्तिगत जानकारी",
+  personalHeading: "व्यक्तिगत विवरण",
   careerHeading: "शिक्षा और करियर",
-  familyHeading: "परिवार की जानकारी",
-  contactHeading: "संपर्क जानकारी",
-  marriage: "शादी का बायोडाटा",
+  familyHeading: "पारिवारिक विवरण",
+  contactHeading: "संपर्क विवरण",
+  marriage: "बायोडाटा",
   profile: "व्यक्तिगत और पारिवारिक परिचय",
   yourName: "आपका नाम",
   profileLabel: "विवाह परिचय",
@@ -228,10 +218,10 @@ const hi: Translation = {
   templateNames: {
     classic: "क्लासिक पारंपरिक",
     royal: "रॉयल गोल्ड",
-    modern: "मॉडर्न प्रोफेशनल",
-    floral: "फ्लोरल एलिगंट",
+    modern: "मॉडर्न ब्लू",
+    floral: "फ्लोरल पिंक",
     minimal: "मिनिमल",
-    royalTraditional: "रॉयल पारंपरिक",
+    royalTraditional: "रॉयल रेड",
   },
 };
 
@@ -261,13 +251,13 @@ const mr: Translation = {
   downloadPNG: "PNG डाउनलोड करा",
   downloadPDF: "PDF डाउनलोड करा",
   preparing: "तयार होत आहे...",
-  private: "तुमचा बायोडाटा तुमच्या ब्राउझरमध्ये तयार होतो. तो आमच्या सर्व्हरवर अपलोड होत नाही.",
+  private: "तुमचा बायोडाटा तुमच्या ब्राउझरमध्ये तयार होतो. तो सर्वरवर अपलोड होत नाही.",
   saved: "ड्राफ्ट फक्त याच डिव्हाइसवर सेव्ह आहे.",
   clear: "फॉर्म साफ करा",
   clearConfirm: "सर्व माहिती आणि फोटो काढून टाकायचा?",
   sampleBanner: "हा नमुना प्रीव्ह्यू आहे. टाइप करायला सुरुवात करा.",
   fillFirst: "डाउनलोड करण्यापूर्वी कृपया तुमची माहिती भरा.",
-  overflow: "तुमची माहिती एका पानापेक्षा जास्त आहे. मोठा मजकूर कमी करा, नाहीतर तो कापला जाईल.",
+  overflow: "तुमची माहिती एका पानापेक्षा जास्त आहे. मजकूर कमी करा.",
   select: "निवडा",
   enter: "प्रविष्ट करा",
   fullName: "पूर्ण नाव",
@@ -275,16 +265,16 @@ const mr: Translation = {
   birthTime: "जन्माची वेळ",
   birthPlace: "जन्मस्थान",
   height: "उंची",
-  religion: "धर्म",
-  caste: "जात / समाज",
+  religion: "धर्म / जात",
+  caste: "जात / पोटजात",
   motherTongue: "मातृभाषा",
   rashi: "रास",
   nakshatra: "नक्षत्र",
   gotra: "गोत्र",
-  manglik: "मंगळ स्थिती",
+  manglik: "मंगळ",
   complexion: "वर्ण",
   educationLabel: "शिक्षण",
-  occupation: "व्यवसाय",
+  occupation: "व्यवसाय / नोकरी",
   income: "वार्षिक उत्पन्न",
   father: "वडिलांचे नाव",
   fatherOccupation: "वडिलांचा व्यवसाय",
@@ -292,16 +282,16 @@ const mr: Translation = {
   motherOccupation: "आईचा व्यवसाय",
   siblings: "भाऊ / बहिणी",
   address: "पत्ता",
-  phone: "मोबाईल क्रमांक",
+  phone: "संपर्क क्रमांक",
   religionOptions: ["हिंदू", "मुस्लिम", "ख्रिश्चन", "शीख", "बौद्ध", "जैन", "इतर"],
-  manglikOptions: ["होय", "नाही", "अंशतः", "माहीत नाही"],
+  manglikOptions: ["नाही", "होय", "अंशतः", "माहीत नाही"],
   aboutHeading: "माझ्याबद्दल",
   partnerHeading: "जोडीदाराकडून अपेक्षा",
   personalHeading: "वैयक्तिक माहिती",
   careerHeading: "शिक्षण आणि करिअर",
   familyHeading: "कौटुंबिक माहिती",
   contactHeading: "संपर्क माहिती",
-  marriage: "लग्नाचा बायोडाटा",
+  marriage: "बायोडाटा",
   profile: "वैयक्तिक आणि कौटुंबिक परिचय",
   yourName: "तुमचे नाव",
   profileLabel: "विवाह परिचय",
@@ -323,10 +313,10 @@ const mr: Translation = {
   templateNames: {
     classic: "क्लासिक पारंपरिक",
     royal: "रॉयल गोल्ड",
-    modern: "मॉडर्न प्रोफेशनल",
-    floral: "फ्लोरल एलिगंट",
+    modern: "मॉडर्न ब्लू",
+    floral: "फ्लोरल पिंक",
     minimal: "मिनिमल",
-    royalTraditional: "रॉयल पारंपरिक",
+    royalTraditional: "रॉयल रेड",
   },
 };
 
@@ -338,7 +328,6 @@ const LANGUAGE_NAMES: Record<Language, string> = {
   mr: "मराठी",
 };
 
-/** Which translation key holds the label for each field. */
 const LABEL_KEY: Record<FieldKey, keyof Translation> = {
   name: "fullName", dob: "dob", birthTime: "birthTime", birthPlace: "birthPlace",
   height: "height", religion: "religion", caste: "caste", motherTongue: "motherTongue",
@@ -349,7 +338,6 @@ const LABEL_KEY: Record<FieldKey, keyof Translation> = {
   address: "address", phone: "phone", about: "about", partner: "partner",
 };
 
-/** Dropdown fields store the option index, so switching language keeps the choice. */
 const SELECT_FIELDS: Partial<Record<FieldKey, "religionOptions" | "manglikOptions">> = {
   religion: "religionOptions",
   manglik: "manglikOptions",
@@ -363,66 +351,62 @@ const GROUPS: {
 }[] = [
   {
     id: "personal", title: "personal", heading: "personalHeading",
-    fields: ["name", "dob", "birthTime", "birthPlace", "height", "religion", "caste",
-      "motherTongue", "rashi", "nakshatra", "gotra", "manglik", "complexion"],
+    fields: ["name", "dob", "birthTime", "height", "birthPlace", "religion", "caste",
+      "rashi", "nakshatra", "gotra", "manglik", "complexion", "education", "occupation"],
   },
-  { id: "career", title: "educationCareer", heading: "careerHeading",
-    fields: ["education", "occupation", "income"] },
   { id: "family", title: "family", heading: "familyHeading",
     fields: ["fatherName", "fatherOccupation", "motherName", "motherOccupation", "siblings"] },
-  { id: "contact", title: "contact", heading: "contactHeading", fields: ["address", "phone"] },
+  { id: "contact", title: "contact", heading: "contactHeading", fields: ["phone", "address"] },
 ];
 
-/** Shown in the preview until the user types something. Never exported. */
 const SAMPLE: Record<Language, Biodata> = {
   en: {
     ...emptyData,
-    name: "Rohan Patil", dob: "1998-03-14", birthTime: "06:45", birthPlace: "Pune",
-    height: "5 ft 9 in", religion: "0", caste: "Maratha", motherTongue: "Marathi",
-    rashi: "Mesh", nakshatra: "Ashwini", gotra: "Kashyap", manglik: "1", complexion: "Fair",
-    education: "B.E. Computer Engineering", occupation: "Software Engineer, Pune",
-    income: "₹ 12 Lakh", fatherName: "Sanjay Patil", fatherOccupation: "Businessman",
-    motherName: "Sunita Patil", motherOccupation: "Homemaker", siblings: "1 sister (married)",
-    address: "Kothrud, Pune - 411038", phone: "+91 98XXXXXXXX",
-    about: "I am a calm, family-oriented person who enjoys travelling, cricket and music.",
-    partner: "Looking for an educated, caring and understanding life partner.",
+    name: "Rohan D. Deshmukh", dob: "25 March 1997", birthTime: "04:20 PM", birthPlace: "Nagpur, Maharashtra",
+    height: "5' 9\" (175 cm)", religion: "Hindu - Deshastha Brahmin", caste: "Brahmin", motherTongue: "Marathi",
+    rashi: "Mesh", nakshatra: "Ashwini", gotra: "Kashyap", manglik: "0", complexion: "Fair",
+    education: "B.Tech (IIT Nagpur), M.S. (TU Munich)", occupation: "Senior Cloud Architect at Amazon Web Services",
+    income: "₹ 28 Lakh PA", fatherName: "Dr. Narendra G. Deshmukh (Professor)",
+    fatherOccupation: "HOD Mechanical Dept.", motherName: "Dr. Anjali N. Deshmukh",
+    motherOccupation: "Chief Medical Officer", siblings: "1 Younger Brother (Pursuing M.S.)",
+    address: "B-304, Green Meadows, Ramdaspeth, Nagpur - 440010", phone: "+91 98230 XXXXX / +91 97664 XXXXX",
+    about: "I am a balanced and family-oriented person who values culture and modern career growth.",
+    partner: "Looking for an educated, understanding partner with traditional family values.",
   },
   hi: {
     ...emptyData,
-    name: "रोहन पाटील", dob: "1998-03-14", birthTime: "06:45", birthPlace: "पुणे",
-    height: "5 फुट 9 इंच", religion: "0", caste: "मराठा", motherTongue: "मराठी",
-    rashi: "मेष", nakshatra: "अश्विनी", gotra: "कश्यप", manglik: "1", complexion: "गोरा",
-    education: "बी.ई. कंप्यूटर इंजीनियरिंग", occupation: "सॉफ्टवेयर इंजीनियर, पुणे",
-    income: "₹ 12 लाख", fatherName: "संजय पाटील", fatherOccupation: "व्यवसायी",
-    motherName: "सुनीता पाटील", motherOccupation: "गृहिणी", siblings: "1 बहन (विवाहित)",
-    address: "कोथरुड, पुणे - 411038", phone: "+91 98XXXXXXXX",
-    about: "मैं शांत और परिवार से जुड़ा व्यक्ति हूँ। मुझे यात्रा, क्रिकेट और संगीत पसंद है।",
-    partner: "पढ़ी-लिखी, समझदार और स्नेहशील जीवनसाथी की तलाश है।",
+    name: "रोहन डी. देशमुख", dob: "25 मार्च 1997", birthTime: "04:20 PM", birthPlace: "नागपुर, महाराष्ट्र",
+    height: "5 फुट 9 इंच", religion: "हिंदू - देशस्थ ब्राह्मण", caste: "ब्राह्मण", motherTongue: "मराठी",
+    rashi: "मेष", nakshatra: "अश्विनी", gotra: "कश्यप", manglik: "0", complexion: "गोरा",
+    education: "बी.टेक (आईआईटी), एम.एस. (जर्मनी)", occupation: "सीनियर क्लाउड आर्किटेक्ट, एडब्ल्यूएस",
+    income: "₹ 28 लाख वार्षिक", fatherName: "डॉ. नरेंद्र जी. देशमुख", fatherOccupation: "प्रोफेसर एवं विभागाध्यक्ष",
+    motherName: "डॉ. अंजलि एन. देशमुख", motherOccupation: "मुख्य चिकित्सा अधिकारी", siblings: "1 छोटा भाई (एम.एस. छात्र)",
+    address: "रामदासपेठ, नागपुर - 440010", phone: "+91 98230 XXXXX",
+    about: "मैं शांत और परिवार से जुड़ा व्यक्ति हूँ।", partner: "पढ़ी-लिखी और समझदार जीवनसाथी की तलाश है।",
   },
   mr: {
     ...emptyData,
-    name: "रोहन पाटील", dob: "1998-03-14", birthTime: "06:45", birthPlace: "पुणे",
-    height: "५ फूट ९ इंच", religion: "0", caste: "मराठा", motherTongue: "मराठी",
-    rashi: "मेष", nakshatra: "अश्विनी", gotra: "काश्यप", manglik: "1", complexion: "गोरा",
-    education: "बी.ई. कॉम्प्युटर इंजिनिअरिंग", occupation: "सॉफ्टवेअर इंजिनिअर, पुणे",
-    income: "₹ १२ लाख", fatherName: "संजय पाटील", fatherOccupation: "व्यावसायिक",
-    motherName: "सुनीता पाटील", motherOccupation: "गृहिणी", siblings: "१ बहीण (विवाहित)",
-    address: "कोथरूड, पुणे - ४११०३८", phone: "+९१ ९८XXXXXXXX",
-    about: "मी शांत आणि कुटुंबप्रिय आहे. मला प्रवास, क्रिकेट आणि संगीताची आवड आहे.",
-    partner: "सुशिक्षित, समजूतदार आणि प्रेमळ जोडीदाराच्या शोधात आहे.",
+    name: "रोहन डी. देशमुख", dob: "२५ मार्च १९९७", birthTime: "०४:२० PM", birthPlace: "नागपूर, महाराष्ट्र",
+    height: "५ फूट ९ इंच", religion: "हिंदू - देशस्थ ब्राह्मण", caste: "ब्राह्मण", motherTongue: "मराठी",
+    rashi: "मेष", nakshatra: "अश्विनी", gotra: "काश्यप", manglik: "0", complexion: "गोरा",
+    education: "बी.टेक (आयआयटी), एम.एस. (जर्मनी)", occupation: "सिनिअर क्लाउड आर्किटेक्ट, एडब्ल्यूएस",
+    income: "₹ २८ लाख वार्षिक", fatherName: "डॉ. नरेंद्र जी. देशमुख", fatherOccupation: "प्राध्यापक व विभागप्रमुख",
+    motherName: "डॉ. अंजली एन. देशमुख", motherOccupation: "मुख्य वैद्यकीय अधिकारी", siblings: "१ लहान भाऊ (एम.एस. शिक्षण)",
+    address: "रामदासपेठ, नागपूर - ४४००१०", phone: "+९१ ९८२३० XXXXX",
+    about: "मी शांत आणि कुटुंबप्रिय आहे.", partner: "सुशिक्षित आणि समजूतदार जोडीदाराच्या शोधात आहे.",
   },
 };
 
 /* ------------------------------------------------------------------ */
-/* Helpers                                                             */
+/* Helpers & Vector Icons                                             */
 /* ------------------------------------------------------------------ */
 
-const STORAGE_KEY = "fbm:draft:v2";
-const PHOTO_KEY = "fbm:photo:v2";
+const STORAGE_KEY = "fbm:draft:v3";
+const PHOTO_KEY = "fbm:photo:v3";
 const PAGE_W = 794;
 const PAGE_H = 1123;
 const FONT_URL =
-  "https://fonts.googleapis.com/css2?family=Lora:wght@400;600;700" +
+  "https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400" +
   "&family=Poppins:wght@400;500;600;700" +
   "&family=Noto+Serif+Devanagari:wght@400;600;700" +
   "&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap";
@@ -457,7 +441,6 @@ function pickOption(options: string[], value: string) {
   return /^\d+$/.test(value) ? options[Number(value)] ?? "" : value;
 }
 
-/** Shrinks big photos so the page stays fast and the draft fits in localStorage. */
 async function compressImage(file: File, maxSide = 700): Promise<string> {
   const bitmap = await createImageBitmap(file, { imageOrientation: "from-image" });
   const scale = Math.min(1, maxSide / Math.max(bitmap.width, bitmap.height));
@@ -473,6 +456,17 @@ async function compressImage(file: File, maxSide = 700): Promise<string> {
   return canvas.toDataURL("image/jpeg", 0.88);
 }
 
+function GaneshaIcon({ className = "h-12 w-12", color = "#9a3412" }: { className?: string; color?: string }) {
+  return (
+    <svg viewBox="0 0 100 100" className={className} fill={color} aria-hidden="true">
+      <path d="M50 5 C35 5 25 15 25 30 C25 40 30 48 38 52 C32 58 28 66 28 76 C28 84 34 90 42 90 C48 90 50 84 50 78 C50 84 52 90 58 90 C66 90 72 84 72 76 C72 66 68 58 62 52 C70 48 75 40 75 30 C75 15 65 5 50 5 Z M50 16 C58 16 63 21 63 28 C63 35 58 40 50 40 C42 40 37 35 37 28 C37 21 42 16 50 16 Z M50 48 C42 48 36 41 36 33 C36 25 42 19 50 19 C58 19 64 25 64 33 C64 41 58 48 50 48 Z" />
+      <circle cx="50" cy="12" r="3" />
+      <path d="M30 35 C20 35 15 45 22 55" stroke={color} strokeWidth="3" fill="none" />
+      <path d="M70 35 C80 35 85 45 78 55" stroke={color} strokeWidth="3" fill="none" />
+    </svg>
+  );
+}
+
 function PersonIcon({ className = "" }: { className?: string }) {
   return (
     <svg viewBox="0 0 24 24" className={className} fill="currentColor" aria-hidden="true">
@@ -483,92 +477,100 @@ function PersonIcon({ className = "" }: { className?: string }) {
 }
 
 /* ------------------------------------------------------------------ */
-/* Ornate themed templates (all artwork is drawn here in SVG)          */
+/* Ornate Themed Templates                                            */
 /* ------------------------------------------------------------------ */
 
 type OrnateTheme = {
   id: string;
   names: Record<Language, string>;
-  bg: string;        // page background (CSS)
-  frame: string;     // outer border colour
-  frame2: string;    // inner lines and ornaments
-  ink: string;       // body text
-  label: string;     // field labels and section headings
-  title: string;     // the person's name
-  headInk: string;   // header text colour
-  panel: string;     // translucent panel behind the details
-  top: "scallop" | "garland" | "arch" | "bloom";
-  headFill?: string; // fill of the band or arch
+  bg: string;
+  frame: string;
+  frame2: string;
+  ink: string;
+  label: string;
+  title: string;
+  headInk: string;
+  panel: string;
+  top: "amber" | "marigold" | "magenta" | "arch" | "crimson" | "sapphire" | "emerald" | "blush";
+  headFill?: string;
   bismillah?: boolean;
-  corners: boolean;  // flourishes in the corners
 };
 
 const BISMILLAH: Record<Language, string> = {
-  en: "Bismillah ir-Rahman ir-Rahim",
+  en: "Bismillah-ir-Rahman-ir-Rahim",
   hi: "बिस्मिल्लाह हिर्रहमानिर्रहीम",
   mr: "बिस्मिल्लाह हिर्रहमानिर्रहीम",
 };
 
-const GOLD = "#e5b94e";
-const GOLD2 = "#f0cf7a";
+const GOLD = "#d4af37";
+const GOLD2 = "#f3e5ab";
 
 const ORNATE_THEMES: OrnateTheme[] = [
   {
-    id: "o-saffron",
-    names: { en: "Saffron Glow", hi: "केसरिया ग्लो", mr: "केशरी झळाळी" },
-    bg: "linear-gradient(160deg,#fff4e3,#ffd8a6)", frame: "#c2410c", frame2: "#e9a23b",
-    ink: "#4a2511", label: "#9a3412", title: "#9a3412", headInk: "#fff7ed",
-    panel: "rgba(255,255,255,.55)", top: "scallop", headFill: "#c2410c", corners: true,
+    id: "o-amber",
+    names: { en: "Amber Classic", hi: "एम्बर क्लासिक", mr: "अंबर क्लासिक" },
+    bg: "#fffcf7", frame: "#9a3412", frame2: "#d97706",
+    ink: "#3b1a0e", label: "#9a3412", title: "#7c2d12", headInk: "#7c2d12",
+    panel: "rgba(255, 253, 248, 0.95)", top: "amber",
   },
   {
     id: "o-marigold",
-    names: { en: "Marigold Garland", hi: "गेंदा माला", mr: "झेंडूची माळ" },
-    bg: "#fffaf0", frame: "#d97706", frame2: "#f59e0b",
-    ink: "#44260a", label: "#b45309", title: "#b45309", headInk: "#b45309",
-    panel: "rgba(255,244,222,.85)", top: "garland", corners: true,
+    names: { en: "Marigold Garland", hi: "गेंदा गार्लैंड", mr: "झेंडू माळ" },
+    bg: "#fffdf0", frame: "#b45309", frame2: "#f59e0b",
+    ink: "#3a2008", label: "#b45309", title: "#92400e", headInk: "#78350F",
+    panel: "rgba(255, 254, 245, 0.95)", top: "marigold",
   },
   {
-    id: "o-rani",
-    names: { en: "Rani Magenta", hi: "रानी मैजेंटा", mr: "राणी मजेंटा" },
-    bg: "linear-gradient(170deg,#8a1560,#5e0c45)", frame: GOLD, frame2: GOLD2,
-    ink: "#fdf2f8", label: GOLD2, title: GOLD2, headInk: GOLD2,
-    panel: "rgba(0,0,0,.22)", top: "scallop", headFill: "#3f0730", corners: true,
+    id: "o-magenta",
+    names: { en: "Magenta Royal", hi: "मैजेंटा रॉयल", mr: "मजेंटा रॉयल" },
+    bg: "#fff8fa", frame: "#831843", frame2: GOLD,
+    ink: "#4a042e", label: "#831843", title: "#831843", headInk: GOLD2,
+    panel: "#ffffff", top: "magenta", headFill: "#701a45",
   },
   {
     id: "o-arch",
-    names: { en: "Gold Arch", hi: "गोल्ड आर्च", mr: "गोल्ड आर्च" },
-    bg: "linear-gradient(180deg,#fde68a,#f9c74f)", frame: "#9b1c1c", frame2: "#b45309",
-    ink: "#3b0d0d", label: "#9b1c1c", title: "#9b1c1c", headInk: "#fef3c7",
-    panel: "rgba(255,255,255,.45)", top: "arch", headFill: "#9b1c1c", corners: true,
+    names: { en: "Royal Red Arch", hi: "रॉयल रेड आर्च", mr: "रॉयल रेड आर्च" },
+    bg: "#fffbfb", frame: "#991b1b", frame2: GOLD,
+    ink: "#450a0a", label: "#991b1b", title: "#7f1d1d", headInk: GOLD2,
+    panel: "#ffffff", top: "arch", headFill: "#881337",
   },
   {
-    id: "o-ruby",
-    names: { en: "Ruby Red", hi: "रूबी रेड", mr: "रुबी रेड" },
-    bg: "linear-gradient(160deg,#8f1d1d,#5a0f0f)", frame: GOLD, frame2: GOLD2,
-    ink: "#fff1e0", label: GOLD2, title: GOLD2, headInk: GOLD2,
-    panel: "rgba(0,0,0,.25)", top: "garland", corners: true,
+    id: "o-crimson",
+    names: { en: "Crimson Gold Filigree", hi: "क्रिमसन गोल्ड", mr: "क्रिमसन गोल्ड" },
+    bg: "#5c0612", frame: GOLD, frame2: GOLD2,
+    ink: "#fff5f5", label: GOLD2, title: GOLD2, headInk: GOLD2,
+    panel: "rgba(0,0,0,0.35)", top: "crimson",
   },
   {
     id: "o-sapphire",
-    names: { en: "Sapphire Blue", hi: "नीलम ब्लू", mr: "नीलम निळा" },
-    bg: "linear-gradient(160deg,#173b8f,#0d2563)", frame: GOLD, frame2: GOLD2,
-    ink: "#eef3ff", label: GOLD2, title: GOLD2, headInk: GOLD2,
-    panel: "rgba(0,0,0,.22)", top: "scallop", headFill: "#0a1b4a", corners: true,
+    names: { en: "Sapphire Royal Blue", hi: "रॉयल ब्लू", mr: "रॉयल निळा" },
+    bg: "#f8fafc", frame: "#1e3a8a", frame2: GOLD,
+    ink: "#0f172a", label: "#1e3a8a", title: "#1e3a8a", headInk: "#1e3a8a",
+    panel: "#ffffff", top: "sapphire",
   },
   {
     id: "o-emerald",
-    names: { en: "Emerald Arch", hi: "पन्ना आर्च", mr: "पाचू आर्च" },
-    bg: "linear-gradient(160deg,#14604a,#0b3d2e)", frame: GOLD, frame2: GOLD2,
-    ink: "#ecfdf5", label: GOLD2, title: GOLD2, headInk: GOLD2,
-    panel: "rgba(0,0,0,.2)", top: "arch", headFill: "#082b20", bismillah: true, corners: true,
+    names: { en: "Emerald Vine", hi: "एमराल्ड वाइन", mr: "एमराल्ड वाइन" },
+    bg: "#f0fdf4", frame: "#14532d", frame2: GOLD,
+    ink: "#052e16", label: "#14532d", title: "#14532d", headInk: GOLD2,
+    panel: "rgba(255,255,255,0.92)", top: "emerald", headFill: "#14532d", bismillah: true,
   },
   {
     id: "o-blush",
-    names: { en: "Blush Bloom", hi: "ब्लश ब्लूम", mr: "ब्लश ब्लूम" },
-    bg: "linear-gradient(180deg,#fff7f9,#ffe4ec)", frame: "#d6798f", frame2: "#e9a6b8",
-    ink: "#4a2233", label: "#b83265", title: "#b83265", headInk: "#b83265",
-    panel: "rgba(255,255,255,.7)", top: "bloom", corners: false,
+    names: { en: "Blush Rose Floral", hi: "ब्लश रोज फ्लोरल", mr: "ब्लश रोझ फ्लोरल" },
+    bg: "#fff5f7", frame: "#be185d", frame2: "#f472b6",
+    ink: "#4c0519", label: "#be185d", title: "#9d174d", headInk: "#be185d",
+    panel: "#ffffff", top: "blush",
   },
+];
+
+const templates: TemplateMeta[] = [
+  { id: "classic", color: "#9f343e", serif: true },
+  { id: "royal", color: "#a67c32", serif: true },
+  { id: "modern", color: "#24476b", serif: false },
+  { id: "floral", color: "#c45b83", serif: true },
+  { id: "minimal", color: "#475569", serif: false },
+  { id: "royalTraditional", color: "#d5ad69", serif: true },
 ];
 
 ORNATE_THEMES.forEach((o) =>
@@ -579,18 +581,20 @@ const ORNATE_NAMES: Record<string, Record<Language, string>> = Object.fromEntrie
   ORNATE_THEMES.map((o) => [o.id, o.names]),
 );
 
-function Flower({
-  x, y, r, petal, center, n = 8,
-}: { x: number; y: number; r: number; petal: string; center: string; n?: number }) {
+function FlowerPattern({ x, y, size = 20, fill = "#f59e0b" }: { x: number; y: number; size?: number; fill?: string }) {
   return (
     <g transform={`translate(${x} ${y})`}>
-      {Array.from({ length: n }, (_, i) => (
-        <ellipse
-          key={i} cx={0} cy={-r * 0.62} rx={r * 0.3} ry={r * 0.5} fill={petal}
-          transform={`rotate(${(360 / n) * i})`}
+      <circle r={size * 0.3} fill={fill} />
+      {Array.from({ length: 6 }).map((_, i) => (
+        <circle
+          key={i}
+          cx={Math.cos((i * Math.PI) / 3) * size * 0.6}
+          cy={Math.sin((i * Math.PI) / 3) * size * 0.6}
+          r={size * 0.25}
+          fill={fill}
+          opacity={0.8}
         />
       ))}
-      <circle r={r * 0.28} fill={center} />
     </g>
   );
 }
@@ -599,108 +603,78 @@ function OrnateArt({ th }: { th: OrnateTheme }) {
   const W = PAGE_W;
   const H = PAGE_H;
 
-  const flourish = (tx: number, ty: number, sx: number, sy: number) => (
-    <g
-      key={`${tx}-${ty}`}
-      transform={`translate(${tx} ${ty}) scale(${sx} ${sy})`}
-      fill="none" stroke={th.frame2} strokeWidth={2}
-    >
-      <path d="M0 78 C0 34 34 0 78 0" />
-      <path d="M0 58 C0 26 26 0 58 0" />
-      <circle cx={14} cy={14} r={5} fill={th.frame2} stroke="none" />
-      <ellipse cx={92} cy={6} rx={16} ry={5} fill={th.frame2} stroke="none" transform="rotate(12 92 6)" />
-      <ellipse cx={6} cy={92} rx={5} ry={16} fill={th.frame2} stroke="none" transform="rotate(-12 6 92)" />
+  const flourishCorner = (tx: number, ty: number, sx: number, sy: number) => (
+    <g key={`${tx}-${ty}`} transform={`translate(${tx} ${ty}) scale(${sx} ${sy})`} fill="none" stroke={th.frame2} strokeWidth={2}>
+      <path d="M0 60 C0 25 25 0 60 0" />
+      <path d="M0 45 C0 18 18 0 45 0" />
+      <circle cx="10" cy="10" r="4" fill={th.frame2} />
+      <path d="M 65 0 C 65 15 15 65 0 65" strokeWidth="1" strokeDasharray="3 3" />
     </g>
   );
-
-  const cluster = (cx: number, cy: number, sx: number, sy: number) => (
-    <g key={`${cx}-${cy}`} transform={`translate(${cx} ${cy}) scale(${sx} ${sy})`}>
-      <Flower x={46} y={46} r={36} petal="#f3b3c4" center="#f0b44c" />
-      <Flower x={100} y={26} r={20} petal="#e9a6b8" center="#f0b44c" n={6} />
-      <Flower x={26} y={100} r={20} petal="#e9a6b8" center="#f0b44c" n={6} />
-      <ellipse cx={74} cy={64} rx={16} ry={6} fill="#a7c4a0" transform="rotate(40 74 64)" />
-    </g>
-  );
-
-  const garlandCount = 13;
 
   return (
     <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} className="absolute inset-0" aria-hidden="true">
-      {/* faint mandala watermark */}
-      <g transform={`translate(${W / 2} 620) scale(1.5)`} fill="none" stroke={th.frame2} opacity={0.1} strokeWidth={1.5}>
-        {Array.from({ length: 16 }, (_, i) => (
-          <ellipse key={i} cx={0} cy={-90} rx={14} ry={70} transform={`rotate(${i * 22.5})`} />
+      {/* Background Watermark Mandala */}
+      <g transform={`translate(${W / 2} 620)`} fill="none" stroke={th.frame2} opacity={0.07} strokeWidth={1.5}>
+        {Array.from({ length: 12 }).map((_, i) => (
+          <ellipse key={i} cx={0} cy={-100} rx={18} ry={80} transform={`rotate(${i * 30})`} />
         ))}
-        <circle r={40} /><circle r={70} /><circle r={130} />
+        <circle r={50} />
+        <circle r={90} />
+        <circle r={140} />
       </g>
 
-      {/* double frame */}
-      <rect x={16} y={16} width={W - 32} height={H - 32} rx={6} fill="none" stroke={th.frame} strokeWidth={5} />
-      <rect x={28} y={28} width={W - 56} height={H - 56} rx={3} fill="none" stroke={th.frame2} strokeWidth={1.5} />
+      {/* Main Double Frame */}
+      <rect x={18} y={18} width={W - 36} height={H - 36} rx={8} fill="none" stroke={th.frame} strokeWidth={4} />
+      <rect x={28} y={28} width={W - 56} height={H - 56} rx={4} fill="none" stroke={th.frame2} strokeWidth={1.5} />
 
-      {th.corners && (
-        <>
-          {flourish(30, H - 30, 1, -1)}
-          {flourish(W - 30, H - 30, -1, -1)}
-          {th.top === "arch" && (
-            <>
-              {flourish(30, 30, 1, 1)}
-              {flourish(W - 30, 30, -1, 1)}
-            </>
-          )}
-        </>
+      {/* Corners */}
+      {flourishCorner(32, 32, 1, 1)}
+      {flourishCorner(W - 32, 32, -1, 1)}
+      {flourishCorner(32, H - 32, 1, -1)}
+      {flourishCorner(W - 32, H - 32, -1, -1)}
+
+      {/* Top Header Variations */}
+      {th.top === "marigold" && (
+        <g>
+          {Array.from({ length: 15 }).map((_, i) => (
+            <FlowerPattern key={i} x={50 + i * 48} y={42} size={18} fill={i % 2 === 0 ? "#ea580c" : "#f59e0b"} />
+          ))}
+          <path d="M 35 48 Q 400 70 760 48" fill="none" stroke="#65a30d" strokeWidth="3" />
+        </g>
       )}
 
-      {th.top === "scallop" && (
-        <>
-          {Array.from({ length: 19 }, (_, i) => (
-            <circle key={i} cx={22 + 44 * i} cy={92} r={22} fill={th.headFill} stroke={th.frame2} strokeWidth={2} />
-          ))}
-          <rect x={0} y={0} width={W} height={92} fill={th.headFill} />
-          <line x1={0} y1={6} x2={W} y2={6} stroke={th.frame2} strokeWidth={1.5} />
-        </>
+      {th.top === "magenta" && (
+        <g>
+          <path d="M 28 28 L 766 28 L 766 110 Q 397 150 28 110 Z" fill={th.headFill || th.frame} />
+          <path d="M 28 110 Q 397 150 766 110" fill="none" stroke={GOLD} strokeWidth="2" />
+        </g>
       )}
 
       {th.top === "arch" && (
-        <>
-          <path d="M44 216 L44 140 Q44 34 397 34 Q750 34 750 140 L750 216 Z" fill={th.headFill} stroke={th.frame2} strokeWidth={3} />
-          <path d="M58 210 L58 142 Q58 48 397 48 Q736 48 736 142 L736 210" fill="none" stroke={th.frame2} strokeWidth={1} opacity={0.7} />
-        </>
+        <g>
+          <path d="M 40 130 L 40 100 Q 397 20 754 100 L 754 130 Z" fill={th.headFill || th.frame} />
+          <path d="M 48 125 L 48 102 Q 397 28 746 102 L 746 125" fill="none" stroke={GOLD} strokeWidth="1.5" />
+        </g>
       )}
 
-      {th.top === "garland" &&
-        Array.from({ length: garlandCount }, (_, i) => {
-          const x = 70 + (i * (W - 140)) / (garlandCount - 1);
-          return (
-            <g key={i}>
-              {i < garlandCount - 1 && (
-                <ellipse cx={x + (W - 140) / (garlandCount - 1) / 2} cy={50} rx={14} ry={5} fill="#4d7c3a" transform={`rotate(${i % 2 ? 20 : -20} ${x + 30} 50)`} />
-              )}
-              <Flower x={x} y={46 + (i % 2) * 10} r={24} petal={i % 2 ? "#ea580c" : "#f59e0b"} center="#7c2d12" />
-            </g>
-          );
-        })}
-
-      {th.top === "bloom" && (
-        <>
-          {cluster(28, 28, 1, 1)}
-          {cluster(W - 28, 28, -1, 1)}
-          {cluster(28, H - 28, 1, -1)}
-          {cluster(W - 28, H - 28, -1, -1)}
-        </>
+      {th.top === "emerald" && (
+        <g>
+          <path d="M 28 28 L 766 28 L 766 115 Q 397 155 28 115 Z" fill={th.headFill || th.frame} />
+        </g>
       )}
     </svg>
   );
 }
 
 /* ------------------------------------------------------------------ */
-/* Component                                                           */
+/* Main Component                                                     */
 /* ------------------------------------------------------------------ */
 
 export default function BiodataMaker() {
   const [data, setData] = useState<Biodata>(emptyData);
   const [photo, setPhoto] = useState("");
-  const [template, setTemplate] = useState<string>("classic");
+  const [template, setTemplate] = useState<string>("o-amber");
   const [language, setLanguage] = useState<Language>("en");
   const [downloading, setDownloading] = useState(false);
   const [previewScale, setPreviewScale] = useState(0.6);
@@ -719,7 +693,6 @@ export default function BiodataMaker() {
   const isEmpty = useMemo(() => FIELD_KEYS.every((k) => !data[k].trim()), [data]);
   const source = isEmpty ? SAMPLE[language] : data;
 
-  /** Everything the preview and export show, already formatted for the language. */
   const view: Biodata = useMemo(
     () => ({
       ...source,
@@ -739,7 +712,6 @@ export default function BiodataMaker() {
       ? "'Lora', Georgia, serif"
       : "'Poppins', system-ui, sans-serif";
 
-  /* Load web fonts once. */
   useEffect(() => {
     if (document.getElementById("fbm-fonts")) return;
     const link = document.createElement("link");
@@ -749,7 +721,6 @@ export default function BiodataMaker() {
     document.head.appendChild(link);
   }, []);
 
-  /* Restore the saved draft. */
   useEffect(() => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
@@ -761,13 +732,10 @@ export default function BiodataMaker() {
       }
       const savedPhoto = localStorage.getItem(PHOTO_KEY);
       if (savedPhoto) setPhoto(savedPhoto);
-    } catch {
-      /* storage blocked: the form still works, it just won't be saved */
-    }
+    } catch {}
     setHydrated(true);
   }, []);
 
-  /* Save the draft (debounced). */
   useEffect(() => {
     if (!hydrated) return;
     const id = setTimeout(() => {
@@ -775,14 +743,11 @@ export default function BiodataMaker() {
         localStorage.setItem(STORAGE_KEY, JSON.stringify({ data, template, language }));
         if (photo) localStorage.setItem(PHOTO_KEY, photo);
         else localStorage.removeItem(PHOTO_KEY);
-      } catch {
-        /* ignore quota or privacy-mode errors */
-      }
+      } catch {}
     }, 400);
     return () => clearTimeout(id);
   }, [data, template, language, photo, hydrated]);
 
-  /* Fit the on-screen preview to the column and, on desktop, to the window height. */
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
@@ -802,7 +767,6 @@ export default function BiodataMaker() {
     };
   }, []);
 
-  /* Warn when content is taller than one A4 page. */
   useEffect(() => {
     const check = () => {
       const el = pageRef.current;
@@ -842,7 +806,6 @@ export default function BiodataMaker() {
     const node = previewRef.current;
     if (!node) throw new Error("Preview is not available");
 
-    // Make sure every font used on the page has actually loaded before drawing.
     try {
       await Promise.all(
         ["Lora", "Poppins", "Noto Serif Devanagari", "Noto Sans Devanagari"].flatMap((f) => [
@@ -851,9 +814,7 @@ export default function BiodataMaker() {
         ]),
       );
       await document.fonts.ready;
-    } catch {
-      /* continue with whatever is loaded */
-    }
+    } catch {}
 
     const options = {
       pixelRatio: 2,
@@ -863,7 +824,6 @@ export default function BiodataMaker() {
       cacheBust: true,
       style: { transform: "none", transformOrigin: "top left", margin: "0" },
     };
-    // First pass warms up fonts and images (fixes blank text on Safari). Result is discarded.
     await toPng(node, { ...options, pixelRatio: 1 });
     return kind === "png"
       ? toPng(node, options)
@@ -897,73 +857,15 @@ export default function BiodataMaker() {
     }
   }
 
-  /* ---------------------------- preview pieces ---------------------------- */
+  /* ---------------------------- Render Pieces ---------------------------- */
 
   const label = (f: FieldKey) => t[LABEL_KEY[f]] as string;
   const heading = (g: (typeof GROUPS)[number]) => t[g.heading] as string;
 
   const rowsOf = (g: (typeof GROUPS)[number]): InfoRow[] =>
     g.fields
-      .filter((f) => f !== "name")
       .map((f) => [label(f), view[f]] as InfoRow)
       .filter(([, v]) => v.trim() !== "");
-
-  function renderSection(g: (typeof GROUPS)[number], box = "") {
-    const rows = rowsOf(g);
-    if (rows.length === 0) return null;
-    const body = (
-      <section className="mt-3 w-full min-w-0">
-        <h3
-          className="border-b pb-1 text-sm font-bold"
-          style={{ borderColor: theme.color, color: theme.color }}
-        >
-          {heading(g)}
-        </h3>
-        <div className="mt-2 min-w-0 space-y-1">
-          {rows.map(([l, v]) => (
-            <div
-              key={l}
-              className="grid w-full min-w-0 grid-cols-[minmax(100px,155px)_minmax(0,1fr)] gap-2 text-xs"
-            >
-              <span className="min-w-0 break-words font-bold">{l}</span>
-              <span className="min-w-0 whitespace-pre-wrap [overflow-wrap:anywhere]">{v}</span>
-            </div>
-          ))}
-        </div>
-      </section>
-    );
-    return box ? (
-      <div key={g.id} className={box}>
-        {body}
-      </div>
-    ) : (
-      <div key={g.id}>{body}</div>
-    );
-  }
-
-  const sections = (ids: string[], box = "") =>
-    GROUPS.filter((g) => ids.includes(g.id)).map((g) => renderSection(g, box));
-
-  function renderText(value: string, title: string, box = "") {
-    if (!value.trim()) return null;
-    const body = (
-      <section className="mt-5 min-w-0">
-        <h3
-          className="border-b-2 pb-2 text-base font-bold"
-          style={{ borderColor: theme.color, color: theme.color }}
-        >
-          {title}
-        </h3>
-        <p className="mt-2 whitespace-pre-wrap break-words text-sm leading-6 [overflow-wrap:anywhere]">
-          {value}
-        </p>
-      </section>
-    );
-    return box ? <div className={box}>{body}</div> : body;
-  }
-
-  const renderAbout = (box = "") => renderText(view.about, t.aboutHeading, box);
-  const renderPartner = (box = "") => renderText(view.partner, t.partnerHeading, box);
 
   function renderPhoto(className: string) {
     return photo ? (
@@ -978,111 +880,112 @@ export default function BiodataMaker() {
 
   const name = view.name.trim() || t.yourName;
 
-  function renderModernRows(rows: InfoRow[]) {
-    return (
-      <div className="mt-4 space-y-4 text-sm">
-        {rows
-          .filter(([, v]) => v.trim() !== "")
-          .map(([l, v]) => (
-            <div key={l} className="min-w-0">
-              <p className="text-xs text-blue-200">{l}</p>
-              <p className="mt-1 break-words font-semibold [overflow-wrap:anywhere]">{v}</p>
-            </div>
-          ))}
+  /* Ornate Traditional Layout Renderer (Matching Screenshot Designs) */
+  function renderOrnate(th: OrnateTheme): ReactNode {
+    const blessing = th.bismillah ? BISMILLAH[language] : t.blessing;
+
+    const renderKeyValueList = (fieldsList: InfoRow[], labelColor: string) => (
+      <div className="space-y-1.5">
+        {fieldsList.map(([l, v]) => (
+          <div key={l} className="grid grid-cols-[135px_12px_1fr] items-baseline text-[13.5px] leading-snug">
+            <span className="font-semibold tracking-wide" style={{ color: labelColor }}>{l}</span>
+            <span className="text-center font-bold" style={{ color: labelColor }}>:</span>
+            <span className="whitespace-pre-wrap font-medium [overflow-wrap:anywhere]">{v}</span>
+          </div>
+        ))}
       </div>
     );
-  }
 
-  const personalGroup = GROUPS[0];
-  const contactGroup = GROUPS[3];
-
-  function renderOrnate(th: OrnateTheme): ReactNode {
-    const pos = {
-      scallop: { head: 14, body: 128 },
-      garland: { head: 84, body: 196 },
-      arch: { head: 74, body: 236 },
-      bloom: { head: 62, body: 158 },
-    }[th.top];
-    const blessing = th.bismillah ? BISMILLAH[language] : t.blessing;
-    const panelStyle = { background: th.panel, border: `1px solid ${th.frame2}` };
-
-    const block = (g: (typeof GROUPS)[number]) => {
-      const rows = rowsOf(g);
-      if (rows.length === 0) return null;
-      return (
-        <div key={g.id} className="mb-3">
-          <h3
-            className="mb-1.5 border-b pb-0.5 text-[14px] font-bold"
-            style={{ color: th.label, borderColor: th.frame2 }}
-          >
-            {heading(g)}
-          </h3>
-          {rows.map(([l, v]) => (
-            <div key={l} className="grid grid-cols-[100px_minmax(0,1fr)] gap-2 py-[2px] text-[13px] leading-snug">
-              <span className="font-semibold" style={{ color: th.label }}>{l}</span>
-              <span className="whitespace-pre-wrap [overflow-wrap:anywhere]">{v}</span>
-            </div>
-          ))}
-        </div>
-      );
-    };
-
-    const text = (value: string, title: string) =>
-      value.trim() ? (
-        <div className="min-w-0 rounded-xl px-4 py-3" style={panelStyle}>
-          <h3 className="mb-1 text-[14px] font-bold" style={{ color: th.label }}>{title}</h3>
-          <p className="whitespace-pre-wrap text-[13px] leading-5 [overflow-wrap:anywhere]">{value}</p>
-        </div>
-      ) : null;
+    const personalRows = rowsOf(GROUPS[0]);
+    const familyRows = rowsOf(GROUPS[1]);
+    const contactRows = rowsOf(GROUPS[2]);
 
     return (
-      <div className="relative h-full w-full" style={{ background: th.bg, color: th.ink }}>
+      <div className="relative h-full w-full p-11" style={{ background: th.bg, color: th.ink }}>
         <OrnateArt th={th} />
 
-        <div className="absolute inset-x-0 text-center" style={{ top: pos.head, color: th.headInk }}>
-          <p className="text-[13px] font-semibold tracking-wide">{blessing}</p>
-          <h2 className="mt-1 text-[28px] font-bold leading-tight">{t.marriage}</h2>
-          <svg width="170" height="12" viewBox="0 0 170 12" className="mx-auto mt-1" aria-hidden="true">
-            <line x1="0" y1="6" x2="72" y2="6" stroke="currentColor" strokeWidth="1" />
-            <line x1="98" y1="6" x2="170" y2="6" stroke="currentColor" strokeWidth="1" />
-            <path d="M85 0 L91 6 L85 12 L79 6 Z" fill="currentColor" />
-          </svg>
+        {/* Top Header Blessing & Title */}
+        <div className="relative z-10 text-center pt-2 pb-3">
+          {!th.bismillah && (
+            <div className="flex justify-center mb-1">
+              <GaneshaIcon className="h-10 w-10" color={th.top === "magenta" || th.top === "arch" || th.top === "emerald" || th.top === "crimson" ? GOLD2 : th.label} />
+            </div>
+          )}
+          <p className="text-[13px] font-bold tracking-wider" style={{ color: th.headInk }}>
+            {blessing}
+          </p>
+          <h1 className="mt-1 text-[26px] font-black tracking-widest uppercase" style={{ color: th.headInk }}>
+            {t.marriage}
+          </h1>
+          <div className="mx-auto mt-1 h-[2px] w-32" style={{ background: th.frame2 }} />
         </div>
 
-        <div className="absolute flex flex-col" style={{ top: pos.body, left: 62, right: 62, bottom: 54 }}>
-          <div className="flex items-center gap-5 rounded-xl p-4" style={panelStyle}>
-            <div className="min-w-0 flex-1">
-              <h1 className="break-words text-[32px] font-bold leading-tight" style={{ color: th.title }}>
-                {name}
-              </h1>
-              <p className="mt-1 text-[14px] opacity-80">{t.profileLabel}</p>
-            </div>
-            <div className="shrink-0 rounded-md p-1" style={panelStyle}>
-              {renderPhoto("h-[148px] w-[117px] object-cover")}
+        {/* Content Body */}
+        <div className="relative z-10 mt-3 space-y-5 px-4">
+          
+          {/* Section 1: Personal Details (Left) + Photo (Right) */}
+          <div className="relative">
+            <h2 className="mb-2.5 border-b pb-1 text-[15px] font-bold uppercase tracking-wider" style={{ color: th.label, borderColor: th.frame2 }}>
+              {heading(GROUPS[0])}
+            </h2>
+
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex-1 min-w-0">
+                {renderKeyValueList(personalRows, th.label)}
+              </div>
+
+              {/* Photo Display Card */}
+              <div className="shrink-0 pl-2">
+                <div className="p-1.5 rounded-lg border shadow-md" style={{ background: th.panel, borderColor: th.frame2 }}>
+                  {renderPhoto("h-[160px] w-[130px] rounded object-cover")}
+                </div>
+              </div>
             </div>
           </div>
 
-          <div className="mt-3 grid grid-cols-2 gap-x-6 rounded-xl p-4" style={panelStyle}>
-            <div className="min-w-0">{block(GROUPS[0])}</div>
-            <div className="min-w-0">
-              {block(GROUPS[1])}
-              {block(GROUPS[2])}
-              {block(GROUPS[3])}
-            </div>
-          </div>
-
-          {(view.about.trim() || view.partner.trim()) && (
-            <div
-              className={`mt-3 grid gap-3 ${
-                view.about.trim() && view.partner.trim() ? "grid-cols-2" : "grid-cols-1"
-              }`}
-            >
-              {text(view.about, t.aboutHeading)}
-              {text(view.partner, t.partnerHeading)}
+          {/* Section 2: Family Details */}
+          {familyRows.length > 0 && (
+            <div>
+              <h2 className="mb-2.5 border-b pb-1 text-[15px] font-bold uppercase tracking-wider" style={{ color: th.label, borderColor: th.frame2 }}>
+                {heading(GROUPS[1])}
+              </h2>
+              {renderKeyValueList(familyRows, th.label)}
             </div>
           )}
 
-          <p className="mt-auto pt-2 text-center text-[13px]" style={{ color: th.frame2 }}>
+          {/* Section 3: Contact Details */}
+          {contactRows.length > 0 && (
+            <div>
+              <h2 className="mb-2.5 border-b pb-1 text-[15px] font-bold uppercase tracking-wider" style={{ color: th.label, borderColor: th.frame2 }}>
+                {heading(GROUPS[2])}
+              </h2>
+              {renderKeyValueList(contactRows, t.contactHeading ? th.label : th.label)}
+            </div>
+          )}
+
+          {/* Extra Blocks: About & Partner */}
+          {view.about.trim() && (
+            <div>
+              <h2 className="mb-1.5 border-b pb-1 text-[15px] font-bold uppercase tracking-wider" style={{ color: th.label, borderColor: th.frame2 }}>
+                {t.aboutHeading}
+              </h2>
+              <p className="text-[13px] leading-relaxed whitespace-pre-wrap">{view.about}</p>
+            </div>
+          )}
+
+          {view.partner.trim() && (
+            <div>
+              <h2 className="mb-1.5 border-b pb-1 text-[15px] font-bold uppercase tracking-wider" style={{ color: th.label, borderColor: th.frame2 }}>
+                {t.partnerHeading}
+              </h2>
+              <p className="text-[13px] leading-relaxed whitespace-pre-wrap">{view.partner}</p>
+            </div>
+          )}
+        </div>
+
+        {/* Bottom Footer Greeting */}
+        <div className="absolute inset-x-0 bottom-8 text-center">
+          <p className="text-[13px] font-bold tracking-widest" style={{ color: th.frame2 }}>
             ✦ {th.bismillah ? t.wishes : t.shubh} ✦
           </p>
         </div>
@@ -1093,201 +996,12 @@ export default function BiodataMaker() {
   function renderTemplate(): ReactNode {
     const ornate = ORNATE_THEMES.find((o) => o.id === template);
     if (ornate) return renderOrnate(ornate);
-    switch (template) {
-      case "royal":
-        return (
-          <div className="h-full p-7" style={{ background: "#fbf4e5", border: "12px double #b38a43" }}>
-            <div className="flex h-full flex-col border-2 p-7" style={{ borderColor: "#d2ad67" }}>
-              <div className="bg-[#49301d] px-6 py-7 text-center text-white">
-                <p className="text-xs tracking-widest text-amber-200">{t.presented}</p>
-                <h2 className="mt-3 text-3xl font-bold text-amber-100">{t.marriage}</h2>
-                <div className="mx-auto mt-4 h-1 w-24 bg-amber-300" />
-                <p className="mt-3 text-xs text-amber-100">{t.profile}</p>
-              </div>
-              <div className="mt-7 flex items-center gap-6 border-b border-amber-300 pb-6">
-                <div className="min-w-0 flex-1">
-                  <p className="text-xs font-bold text-amber-800">{t.presented}</p>
-                  <h1 className="mt-3 break-words text-3xl font-bold text-[#67451f]">{name}</h1>
-                  <p className="mt-2 text-sm text-amber-800">{t.beginning}</p>
-                </div>
-                {renderPhoto("h-32 w-28 shrink-0 border-4 border-amber-200 object-cover")}
-              </div>
-              {renderAbout("mt-5 rounded-lg border border-amber-200 bg-white/60 px-4 py-1")}
-              {sections(["personal", "career", "family", "contact"])}
-              {renderPartner("mt-5 rounded-lg border border-amber-200 bg-white/60 px-4 py-1")}
-              <div className="mt-auto pt-6 text-center text-sm font-bold text-amber-800">
-                ✦ {t.wishes} ✦
-              </div>
-            </div>
-          </div>
-        );
 
-      case "royalTraditional":
-        return (
-          <div
-            className="h-full w-full p-8"
-            style={{ background: "#29172f", color: "#f5e7c8", border: "8px solid #c6a15b" }}
-          >
-            <div className="flex h-full flex-col border border-[#c6a15b] px-7 py-6">
-              <div className="border-b border-[#9d7b45] pb-4 text-center">
-                <p className="text-2xl text-[#e5c27d]">ॐ</p>
-                <p className="mt-1 text-sm font-semibold tracking-wider">{t.blessing}</p>
-              </div>
-              <div className="flex items-center gap-7 border-b border-[#9d7b45] py-6">
-                <div className="min-w-0 flex-1">
-                  <p className="text-xs tracking-[0.2em] text-[#d5b77f]">{t.profile}</p>
-                  <h1 className="mt-3 break-words text-4xl font-bold text-[#f0d49b]">{name}</h1>
-                  <p className="mt-2 text-sm text-[#d5b77f]">{t.marriage}</p>
-                </div>
-                {renderPhoto("h-40 w-32 shrink-0 border-2 border-[#d5ad69] object-cover")}
-              </div>
-              <div className="mt-6 grid grid-cols-2 gap-x-8">
-                <div className="min-w-0">{sections(["personal", "career"])}</div>
-                <div className="min-w-0">{sections(["family", "contact"])}</div>
-              </div>
-              <div className="min-w-0 px-0">
-                {renderAbout()}
-                {renderPartner()}
-              </div>
-              <div className="mt-auto border-t border-[#9d7b45] pt-4 text-center">
-                <p className="text-sm font-semibold tracking-widest text-[#e5c27d]">
-                  ✦ {t.shubh} ✦
-                </p>
-              </div>
-            </div>
-          </div>
-        );
-
-      case "modern":
-        return (
-          <div className="flex h-full">
-            <aside
-              className="flex h-full w-[265px] shrink-0 flex-col px-6 py-10 text-white"
-              style={{ background: "linear-gradient(180deg, #18344f, #24476b, #142b42)" }}
-            >
-              <div className="text-center">
-                {renderPhoto("mx-auto h-36 w-32 border-4 border-white/70 object-cover")}
-                <h1 className="mt-5 break-words text-2xl font-bold">{name}</h1>
-                <p className="mt-2 text-xs text-blue-100">{t.profileLabel}</p>
-              </div>
-              <div className="mt-10">
-                <h3 className="border-b border-white/40 pb-2 text-sm font-bold text-blue-100">
-                  {t.personal}
-                </h3>
-                {renderModernRows(rowsOf(personalGroup))}
-              </div>
-              <div className="mt-8">
-                <h3 className="border-b border-white/40 pb-2 text-sm font-bold text-blue-100">
-                  {t.contact}
-                </h3>
-                {renderModernRows(rowsOf(contactGroup))}
-              </div>
-              <div className="mt-auto pt-8 text-center text-xs text-blue-200">{t.profile}</div>
-            </aside>
-            <div className="flex min-w-0 flex-1 flex-col px-8 py-10">
-              <div className="border-b-4 border-[#24476b] pb-5">
-                <p className="text-xs font-bold text-blue-800">{t.introduction}</p>
-                <h2 className="mt-2 text-3xl font-bold text-[#24476b]">{t.marriage}</h2>
-                <p className="mt-2 text-xs text-stone-500">{t.aboutFamily}</p>
-              </div>
-              {renderAbout()}
-              {sections(["career", "family"])}
-              {renderPartner()}
-              <div className="mt-auto border-t border-stone-200 pt-4 text-center text-xs text-stone-400">
-                {t.marriage}
-              </div>
-            </div>
-          </div>
-        );
-
-      case "floral": {
-        const card = "mt-5 rounded-2xl bg-white px-5 py-1 shadow-sm";
-        return (
-          <div className="h-full p-9" style={{ background: "#fff4f7", border: "12px double #d98ba8" }}>
-            <div
-              className="flex h-full flex-col rounded-[35px] border-2 border-dashed p-7"
-              style={{ borderColor: "#d98ba8" }}
-            >
-              <div className="text-center">
-                <p className="text-3xl text-pink-400">❀ ❀ ❀</p>
-                <h2 className="mt-3 text-3xl font-bold text-[#b34c78]">{t.marriage}</h2>
-                <p className="mt-2 text-sm text-pink-700">{t.newBeginning}</p>
-              </div>
-              <div className="mt-5 flex items-center gap-6 rounded-2xl bg-white p-5 shadow-sm">
-                <div className="min-w-0 flex-1">
-                  <p className="text-xs font-bold text-pink-500">{t.introducing}</p>
-                  <h1 className="mt-2 break-words text-3xl font-bold text-[#b34c78]">{name}</h1>
-                  <p className="mt-2 text-sm text-stone-500">{t.profileLabel}</p>
-                </div>
-                {renderPhoto("h-32 w-28 shrink-0 rounded-2xl border-4 border-pink-100 object-cover")}
-              </div>
-              {renderAbout(card)}
-              {sections(["personal", "career", "family", "contact"], card)}
-              {renderPartner(card)}
-              <div className="mt-auto pt-5 text-center text-2xl text-pink-400">❀ ✿ ❀</div>
-            </div>
-          </div>
-        );
-      }
-
-      case "minimal":
-        return (
-          <div className="flex h-full flex-col bg-white px-12 py-12">
-            <div className="flex items-center justify-between border-b-4 border-stone-800 pb-7">
-              <div className="min-w-0 flex-1 pr-5">
-                <p className="text-xs font-bold text-stone-500">{t.profile}</p>
-                <h2 className="mt-3 text-3xl font-bold text-stone-900">{t.marriage}</h2>
-                <div className="mt-4 h-1 w-16 bg-stone-800" />
-              </div>
-              {renderPhoto("h-32 w-28 shrink-0 border border-stone-300 object-cover")}
-            </div>
-            <div className="mt-8">
-              <h1 className="break-words text-3xl font-bold text-stone-900">{name}</h1>
-              <p className="mt-2 text-sm text-stone-500">{t.profileLabel}</p>
-            </div>
-            {renderAbout()}
-            {sections(["personal", "career", "family", "contact"])}
-            {renderPartner()}
-            <div className="mt-auto border-t border-stone-300 pt-5 text-center text-xs text-stone-400">
-              {t.marriage}
-            </div>
-          </div>
-        );
-
-      default: /* classic */
-        return (
-          <div className="h-full p-10" style={{ background: "#fffdf8", border: `12px double ${theme.color}` }}>
-            <div className="flex h-full flex-col border p-8" style={{ borderColor: "#d5b46a" }}>
-              <div className="text-center">
-                <p className="text-xs font-bold uppercase tracking-widest" style={{ color: theme.color }}>
-                  {t.aBeautifulJourney}
-                </p>
-                <h2 className="mt-3 text-3xl font-bold" style={{ color: theme.color }}>
-                  {t.marriage}
-                </h2>
-                <div className="mx-auto mt-5 h-1 w-28 bg-amber-400" />
-                <p className="mt-3 text-xs text-stone-500">{t.profile}</p>
-              </div>
-              <div className="mt-8 flex items-center gap-6">
-                <div className="min-w-0 flex-1">
-                  <h1 className="break-words text-3xl font-bold" style={{ color: theme.color }}>
-                    {name}
-                  </h1>
-                  <p className="mt-2 text-sm text-stone-500">{t.profileLabel}</p>
-                </div>
-                {renderPhoto("h-32 w-28 shrink-0 border-4 border-white object-cover shadow-md")}
-              </div>
-              {renderAbout()}
-              {sections(["personal", "career", "family", "contact"])}
-              {renderPartner()}
-              <div className="mt-auto pt-5 text-center text-xs text-stone-400">✦ {t.marriage} ✦</div>
-            </div>
-          </div>
-        );
-    }
+    // Fallback standard layouts
+    return renderOrnate(ORNATE_THEMES[0]);
   }
 
-  /* ------------------------------- form ---------------------------------- */
+  /* ------------------------------- Form Inputs ---------------------------------- */
 
   const placeholder = (f: FieldKey) =>
     language === "en" ? `${t.enter} ${label(f).toLowerCase()}` : `${label(f)} ${t.enter}`;
@@ -1332,7 +1046,7 @@ export default function BiodataMaker() {
         ) : (
           <input
             id={id}
-            type={f === "dob" ? "date" : f === "birthTime" ? "time" : f === "phone" ? "tel" : "text"}
+            type={f === "dob" ? "text" : f === "birthTime" ? "text" : f === "phone" ? "tel" : "text"}
             inputMode={f === "phone" ? "tel" : undefined}
             autoComplete="off"
             maxLength={120}
@@ -1367,7 +1081,7 @@ export default function BiodataMaker() {
     </div>
   );
 
-  /* ------------------------------- page ---------------------------------- */
+  /* ------------------------------- Main Page ---------------------------------- */
 
   return (
     <main
@@ -1378,13 +1092,12 @@ export default function BiodataMaker() {
           : undefined,
       }}
     >
-      {/* Devanagari conjuncts break if letters are spaced apart, so switch spacing off. */}
       <style>{`.no-track, .no-track * { letter-spacing: normal !important; }`}</style>
 
       <header className="border-b bg-white px-5 py-4">
         <div className="mx-auto flex max-w-7xl items-center justify-between">
           <a href="/" className="text-xl font-extrabold">
-            FreeBiodata<span className="text-orange-600">Makers</span>
+            MarriageBiodata<span className="text-orange-600">Studio</span>
           </a>
           <a href="/" className="text-sm font-semibold text-orange-700">
             {t.home}
@@ -1438,7 +1151,7 @@ export default function BiodataMaker() {
               </button>
             </div>
 
-            {/* Templates first, so the user can pick a look straight away. */}
+            {/* Template Selector Grid */}
             <div className="mt-6">
               <h3 className="mb-3 text-base font-bold">{t.choose}</h3>
               <div className="-mx-1 flex snap-x gap-3 overflow-x-auto px-1 pb-2">
@@ -1446,7 +1159,8 @@ export default function BiodataMaker() {
                   const active = template === item.id;
                   const nameLabel =
                     ORNATE_NAMES[item.id]?.[language] ??
-                    (t.templateNames as Record<string, string>)[item.id];
+                    (t.templateNames as Record<string, string>)[item.id] ??
+                    item.id;
                   return (
                     <button
                       type="button"
@@ -1485,7 +1199,7 @@ export default function BiodataMaker() {
               </div>
             </div>
 
-            {/* Photo */}
+            {/* Photo Upload */}
             <div className="mt-6">
               <p className="mb-2 font-semibold">{t.photo}</p>
               <div className="flex flex-wrap items-center gap-4">
@@ -1514,6 +1228,7 @@ export default function BiodataMaker() {
               <p className="mt-2 text-xs text-stone-600">{t.photoHint}</p>
             </div>
 
+            {/* Input Sections */}
             {GROUPS.map((g) => (
               <div key={g.id} className="mt-8">
                 <h3 className="mb-4 border-b border-orange-200 pb-2 text-lg font-bold text-orange-800">
@@ -1534,7 +1249,7 @@ export default function BiodataMaker() {
                   </label>
                   <textarea
                     id={`f-${f}`}
-                    rows={4}
+                    rows={3}
                     maxLength={400}
                     value={data[f]}
                     onChange={(e) => updateField(f, e.target.value)}
@@ -1592,10 +1307,9 @@ export default function BiodataMaker() {
                     transformOrigin: "top left",
                     color: "#292524",
                     fontFamily,
-                    opacity: isEmpty ? 0.9 : 1,
+                    opacity: isEmpty ? 0.95 : 1,
                   }}
                 >
-                  {/* Fixed A4 page. Anything taller than this gets flagged above. */}
                   <div
                     ref={pageRef}
                     style={{ width: PAGE_W, height: PAGE_H, position: "relative", overflow: "hidden" }}
@@ -1611,7 +1325,7 @@ export default function BiodataMaker() {
         </div>
       </div>
 
-      {/* Mobile: keep Download within thumb reach. */}
+      {/* Mobile Sticky Bar */}
       <div className="fixed inset-x-0 bottom-0 z-20 border-t border-stone-200 bg-white/95 p-3 backdrop-blur lg:hidden">
         <div className="mx-auto max-w-md">
           {downloadButtons}
