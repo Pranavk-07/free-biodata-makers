@@ -1,127 +1,64 @@
-"use client";
-
 import Link from "next/link";
-import { useState } from "react";
+import type { Metadata } from "next";
 
-export default function ContactPage() {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [subject, setSubject] = useState("");
-  const [message, setMessage] = useState("");
+export const metadata: Metadata = {
+  title: "Privacy Policy",
+  description:
+    "Privacy Policy for Free Biodata Makers. Learn how we protect your personal information and photo privacy.",
+};
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-
-    const mailtoLink = `mailto:freebiodatamakers@gmail.com?subject=${encodeURIComponent(
-      subject
-    )}&body=${encodeURIComponent(
-      `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`
-    )}`;
-
-    window.location.href = mailtoLink;
-  }
-
+export default function PrivacyPolicyPage() {
   return (
-    <main className="min-h-screen bg-gray-50 px-4 py-12">
-      <div className="mx-auto max-w-3xl rounded-2xl bg-white p-6 shadow-sm sm:p-10">
+    <main className="min-h-screen bg-stone-50 px-4 py-12 sm:px-6 lg:px-8 text-stone-800">
+      <div className="mx-auto max-w-4xl rounded-2xl border border-stone-200 bg-white p-6 sm:p-10 shadow-sm">
         <Link
           href="/"
-          className="mb-8 inline-block text-sm font-medium text-blue-600 hover:underline"
+          className="inline-flex items-center gap-2 text-sm font-semibold text-orange-600 hover:underline"
         >
           ← Back to Home
         </Link>
 
-        <h1 className="mb-4 text-3xl font-bold text-gray-900">
-          Contact Us
+        <h1 className="mt-6 text-3xl font-extrabold text-stone-900 sm:text-4xl">
+          Privacy Policy
         </h1>
+        <p className="mt-1 text-xs text-stone-500">Last updated: May 2024</p>
 
-        <p className="mb-8 leading-7 text-gray-600">
-          Have a question, suggestion, or feedback? We would love to hear
-          from you. Fill out the form below to get in touch with us.
-        </p>
+        <div className="mt-8 space-y-6 text-sm leading-relaxed text-stone-700">
+          <section className="rounded-xl bg-orange-50/70 p-5 border border-orange-100">
+            <h2 className="text-base font-bold text-orange-950">1. Client-Side Data Protection (Zero Server Uploads)</h2>
+            <p className="mt-2 text-orange-900">
+              Your privacy is our highest priority. All information entered into our tools (including personal names, dates of birth, contact phone numbers, family details, and uploaded photographs) is processed <strong>entirely inside your web browser</strong>. We do not store, record, transmit, or upload any of your personal details or images to external databases or remote servers.
+            </p>
+          </section>
 
-        <div className="mb-8 rounded-xl bg-blue-50 p-5">
-          <h2 className="mb-2 text-lg font-semibold text-gray-900">
-            Email Us
-          </h2>
+          <section>
+            <h2 className="text-base font-bold text-stone-900">2. Local Storage Usage</h2>
+            <p className="mt-2">
+              Our tools use your browser&apos;s local storage mechanism (`localStorage`) purely for draft auto-saving functionality. This allows you to resume editing your biodata if you accidentally refresh the page. This data remains on your device only and can be cleared anytime by clicking the &quot;Clear Form&quot; button.
+            </p>
+          </section>
 
-          <a
-            href="mailto:freebiodatamakers@gmail.com"
-            className="break-all font-medium text-blue-600 hover:underline"
-          >
-            freebiodatamakers@gmail.com
-          </a>
+          <section>
+            <h2 className="text-base font-bold text-stone-900">3. Log Files & Cookies</h2>
+            <p className="mt-2">
+              freebiodatamakers.com follows standard procedures using log files. These files log visitors when they visit websites. Third-party services (such as Google AdSense and analytics) may use cookies, JavaScript, or Web Beacons to measure advertising effectiveness and personalize ad content.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-base font-bold text-stone-900">4. Third-Party Advertising (Google AdSense)</h2>
+            <p className="mt-2">
+              Google is a third-party vendor on our site. It uses cookies, known as DART cookies, to serve ads to our site visitors based upon their visit to freebiodatamakers.com and other sites on the internet. Visitors may decline the use of DART cookies by visiting Google&apos;s Ad and Content Network Privacy Policy.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-base font-bold text-stone-900">5. Contact Information</h2>
+            <p className="mt-2">
+              If you have any questions or concerns regarding this Privacy Policy, please email us at <strong>support@freebiodatamakers.com</strong>.
+            </p>
+          </section>
         </div>
-
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <div>
-            <label className="mb-2 block font-medium text-gray-700">
-              Your Name
-            </label>
-            <input
-              type="text"
-              required
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Enter your name"
-              className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-blue-500"
-            />
-          </div>
-
-          <div>
-            <label className="mb-2 block font-medium text-gray-700">
-              Your Email
-            </label>
-            <input
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter your email"
-              className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-blue-500"
-            />
-          </div>
-
-          <div>
-            <label className="mb-2 block font-medium text-gray-700">
-              Subject
-            </label>
-            <input
-              type="text"
-              required
-              value={subject}
-              onChange={(e) => setSubject(e.target.value)}
-              placeholder="Enter subject"
-              className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-blue-500"
-            />
-          </div>
-
-          <div>
-            <label className="mb-2 block font-medium text-gray-700">
-              Your Message
-            </label>
-            <textarea
-              required
-              rows={5}
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              placeholder="Write your message here..."
-              className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-blue-500"
-            />
-          </div>
-
-          <button
-            type="submit"
-            className="w-full rounded-lg bg-blue-600 px-6 py-3 font-semibold text-white transition hover:bg-blue-700"
-          >
-            Send Message
-          </button>
-        </form>
-
-        <p className="mt-4 text-sm text-gray-500">
-          Clicking Send Message will open your default email application
-          with your message prepared. You will need to send it from there.
-        </p>
       </div>
     </main>
   );

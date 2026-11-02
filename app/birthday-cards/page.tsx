@@ -1,5 +1,5 @@
 "use client";
-
+import BirthdaySeoContent from "@/app/components/BirthdaySeoContent";
 import { useEffect, useRef, useState, useMemo } from "react";
 import { toPng } from "html-to-image";
 import jsPDF from "jspdf";
@@ -1174,6 +1174,7 @@ export default function BirthdayCardsPage() {
           </section>
         </div>
       </div>
+      <BirthdaySeoContent />
     </main>
   );
 }

@@ -1,89 +1,60 @@
 import Link from "next/link";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "About Us",
+  description:
+    "Learn about Free Biodata Makers. We provide free, privacy-focused online tools to create marriage biodata, wedding invitations, and festival cards in English, Hindi, and Marathi.",
+};
 
 export default function AboutPage() {
   return (
-    <main className="min-h-screen bg-gray-50 px-4 py-12">
-      <div className="mx-auto max-w-4xl rounded-2xl bg-white p-6 shadow-sm sm:p-10">
+    <main className="min-h-screen bg-stone-50 px-4 py-12 sm:px-6 lg:px-8 text-stone-800">
+      <div className="mx-auto max-w-4xl rounded-2xl border border-stone-200 bg-white p-6 sm:p-10 shadow-sm">
         <Link
           href="/"
-          className="mb-8 inline-block text-sm font-medium text-blue-600 hover:underline"
+          className="inline-flex items-center gap-2 text-sm font-semibold text-orange-600 hover:underline"
         >
           ← Back to Home
         </Link>
 
-        <h1 className="mb-6 text-3xl font-bold text-gray-900 sm:text-4xl">
+        <h1 className="mt-6 text-3xl font-extrabold text-stone-900 sm:text-4xl">
           About Free Biodata Makers
         </h1>
 
-        <section className="space-y-5 text-gray-700 leading-7">
+        <p className="mt-2 text-sm font-semibold uppercase tracking-wider text-orange-600">
+          Empowering Indian Families With Free, High-Quality Digital Stationery
+        </p>
+
+        <div className="mt-8 space-y-6 text-sm leading-relaxed text-stone-700 sm:text-base">
           <p>
-            Welcome to Free Biodata Makers, a simple online platform designed
-            to help people create beautiful and professional biodata and
-            invitation cards with ease.
+            Welcome to <strong>Free Biodata Makers</strong> (freebiodatamakers.com). Our mission is simple: to make the process of creating professional Indian marriage biodata, wedding invitations, birthday cards, and festival greeting cards simple, beautiful, and completely free for everyone.
           </p>
 
-          <h2 className="text-xl font-semibold text-gray-900">
-            What We Offer
-          </h2>
+          <div className="grid gap-6 md:grid-cols-2 mt-6">
+            <div className="rounded-xl border border-stone-200 bg-orange-50/50 p-5">
+              <h2 className="text-lg font-bold text-stone-900"> Our Mission</h2>
+              <p className="mt-2 text-sm text-stone-600">
+                Matchmaking and family celebrations should start with dignity and elegance. We provide high-definition, cultural templates in English, Hindi, and Marathi without requiring registration, subscriptions, or watermarks.
+              </p>
+            </div>
 
-          <p>
-            Our goal is to make designing personal documents and invitation
-            cards simple and accessible. You can use our tools to create:
-          </p>
+            <div className="rounded-xl border border-stone-200 bg-orange-50/50 p-5">
+              <h2 className="text-lg font-bold text-stone-900"> Privacy First</h2>
+              <p className="mt-2 text-sm text-stone-600">
+                We believe your personal family information belongs strictly to you. All our tools operate locally inside your browser—your photographs and biodata entries are never saved, stored, or uploaded to any server.
+              </p>
+            </div>
+          </div>
 
-          <ul className="list-disc space-y-2 pl-6">
-            <li>Marriage biodata with professional templates.</li>
-            <li>Wedding invitation cards.</li>
-            <li>Birthday invitation cards.</li>
-            <li>Traditional puja and celebration cards.</li>
+          <h2 className="text-xl font-bold text-stone-900 pt-4">What We Offer</h2>
+          <ul className="list-disc space-y-2 pl-5 text-stone-600">
+            <li><strong>Marriage Biodata Builder:</strong> Tailored templates featuring Ganesha motifs, detailed horoscope fields, and family background blocks.</li>
+            <li><strong>Wedding Invitations:</strong> Elegant traditional and modern wedding cards shareable via WhatsApp or ready for printing.</li>
+            <li><strong>Festival & Birthday Cards:</strong> Custom greeting cards for Birthdays, Ganesh Chaturthi, and Puja ceremonies.</li>
+            <li><strong>Multilingual Support:</strong> Seamless switching between English, Hindi (हिन्दी), and Marathi (मराठी).</li>
           </ul>
-
-          <h2 className="text-xl font-semibold text-gray-900">
-            Our Mission
-          </h2>
-
-          <p>
-            We aim to provide easy-to-use, accessible, and free online tools
-            that help people create attractive designs without requiring
-            graphic design skills or complicated software.
-          </p>
-
-          <h2 className="text-xl font-semibold text-gray-900">
-            Easy to Use
-          </h2>
-
-          <p>
-            Our tools are designed with simple forms and live previews so
-            users can enter their details, choose a design, and download their
-            creations.
-          </p>
-
-          <h2 className="text-xl font-semibold text-gray-900">
-            Our Commitment
-          </h2>
-
-          <p>
-            We continuously work to improve the website, add useful features,
-            and provide a smooth experience across mobile phones, tablets,
-            and desktop devices.
-          </p>
-
-          <h2 className="text-xl font-semibold text-gray-900">
-            Contact Us
-          </h2>
-
-          <p>
-            Have a question, suggestion, or feedback? We would be happy to
-            hear from you. Visit our{" "}
-            <Link
-              href="/contact"
-              className="font-medium text-blue-600 hover:underline"
-            >
-              Contact Us
-            </Link>{" "}
-            page.
-          </p>
-        </section>
+        </div>
       </div>
     </main>
   );

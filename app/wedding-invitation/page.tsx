@@ -1,5 +1,5 @@
 "use client";
-
+import WeddingSeoContent from "@/app/components/WeddingSeoContent";
 import { useEffect, useRef, useState, useMemo } from "react";
 import { toPng } from "html-to-image";
 import jsPDF from "jspdf";
@@ -1188,6 +1188,7 @@ export default function WeddingInvitationPage() {
           </section>
         </div>
       </div>
+      <WeddingSeoContent />
     </main>
   );
 }
