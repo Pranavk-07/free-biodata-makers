@@ -1,4 +1,4 @@
- 
+ import Script from "next/script";
 import Navbar from "./components/Navbar";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
@@ -97,10 +97,7 @@ export const metadata: Metadata = {
  
  
  
- 
- 
-
-export default function RootLayout({
+ export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -110,6 +107,21 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
+      <head>
+        {/* Paste your Measurement ID below where it says YOUR_MEASUREMENT_ID */}
+        <Script
+          strategy="afterInteractive"
+          src={`https://www.googletagmanager.com/gtag/js?id=G-H5LDC8WEYF`}
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-H5LDC8WEYF');
+          `}
+        </Script>
+      </head>
       <body className="min-h-full flex flex-col">
         <Navbar />
         {children}
@@ -117,3 +129,23 @@ export default function RootLayout({
     </html>
   );
 }
+ 
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
