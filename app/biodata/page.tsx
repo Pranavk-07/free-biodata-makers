@@ -1,5 +1,5 @@
 "use client";
-
+import { BIODATA_TEMPLATES } from "@/app/components/biodataTemplates";
 import SeoContentSection from "@/app/components/SeoContentSection";
 import {
   useEffect,
@@ -27,7 +27,7 @@ const FIELD_KEYS = [
 ] as const;
 
 type FieldKey = (typeof FIELD_KEYS)[number];
-type Biodata = Record<FieldKey, string>;
+export type Biodata = Record<FieldKey, string>;
 type InfoRow = [string, string];
 
 const emptyData = Object.fromEntries(FIELD_KEYS.map((k) => [k, ""])) as Biodata;
@@ -565,18 +565,32 @@ const ORNATE_THEMES: OrnateTheme[] = [
   },
 ];
 
-const templates: TemplateMeta[] = [
-  { id: "classic", color: "#9f343e", serif: true },
-  { id: "royal", color: "#a67c32", serif: true },
-  { id: "modern", color: "#24476b", serif: false },
-  { id: "floral", color: "#c45b83", serif: true },
-  { id: "minimal", color: "#475569", serif: false },
-  { id: "royalTraditional", color: "#d5ad69", serif: true },
-];
+ const templates: TemplateMeta[] = [
+  ...BIODATA_TEMPLATES.map((t) => ({
+    id: t.id,
+    color: t.accent,
+    serif: t.font === "serif",
+    bg: t.bg,
+  })),
 
-ORNATE_THEMES.forEach((o) =>
-  templates.push({ id: o.id, color: o.frame, serif: true, bg: o.bg }),
-);
+  ...ORNATE_THEMES.map((o) => ({
+    id: o.id,
+    color: o.frame,
+    serif: true,
+    bg: o.bg,
+  })),
+];
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
 
 const ORNATE_NAMES: Record<string, Record<Language, string>> = Object.fromEntries(
   ORNATE_THEMES.map((o) => [o.id, o.names]),
@@ -675,7 +689,7 @@ function OrnateArt({ th }: { th: OrnateTheme }) {
 export default function BiodataMaker() {
   const [data, setData] = useState<Biodata>(emptyData);
   const [photo, setPhoto] = useState("");
-  const [template, setTemplate] = useState<string>("o-amber");
+  const [template, setTemplate] = useState<string>("royal=gold");
   const [language, setLanguage] = useState<Language>("en");
   const [downloading, setDownloading] = useState(false);
   const [previewScale, setPreviewScale] = useState(0.6);
@@ -995,12 +1009,193 @@ export default function BiodataMaker() {
   }
 
   function renderTemplate(): ReactNode {
-    const ornate = ORNATE_THEMES.find((o) => o.id === template);
-    if (ornate) return renderOrnate(ornate);
+  // Original 8 ornate templates
+  const ornate = ORNATE_THEMES.find((o) => o.id === template);
 
-    // Fallback standard layouts
+  if (ornate) {
+    return renderOrnate(ornate);
+  }
+
+  // New 40 biodata templates
+  const selectedTemplate = BIODATA_TEMPLATES.find(
+    (t) => t.id === template
+  );
+
+  if (!selectedTemplate) {
     return renderOrnate(ORNATE_THEMES[0]);
   }
+
+  const isDark = selectedTemplate.id === "modern-charcoal";
+
+  const renderRows = (fields: InfoRow[]) => (
+    <div className="space-y-2">
+      {fields.map(([labelText, value]) => (
+        <div
+          key={labelText}
+          className="grid grid-cols-[135px_12px_1fr] items-baseline text-[13px] leading-snug"
+        >
+          <span
+            className="font-semibold"
+            style={{ color: selectedTemplate.headingColor }}
+          >
+            {labelText}
+          </span>
+
+          <span
+            className="text-center font-bold"
+            style={{ color: selectedTemplate.accent }}
+          >
+            :
+          </span>
+
+          <span className="whitespace-pre-wrap break-words">
+            {value}
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+
+  const personalRows = rowsOf(GROUPS[0]);
+  const familyRows = rowsOf(GROUPS[1]);
+  const contactRows = rowsOf(GROUPS[2]);
+
+  return (
+    <div
+      className="relative h-full w-full p-11"
+      style={{
+        background: selectedTemplate.bg,
+        color: isDark ? "#ffffff" : "#292524",
+        border: `12px solid ${selectedTemplate.border}`,
+        fontFamily:
+          selectedTemplate.font === "serif"
+            ? "'Lora', Georgia, serif"
+            : "'Poppins', sans-serif",
+      }}
+    >
+      <div
+        className="border-b-2 pb-5 text-center"
+        style={{ borderColor: selectedTemplate.accent }}
+      >
+        <h1
+          className="text-3xl font-bold uppercase tracking-wider"
+          style={{ color: selectedTemplate.headingColor }}
+        >
+          {name}
+        </h1>
+
+        <p
+          className="mt-2 text-lg font-semibold tracking-widest"
+          style={{ color: selectedTemplate.accent }}
+        >
+          {t.marriage}
+        </p>
+      </div>
+
+      <div className="mt-7 space-y-6 px-3">
+        <section>
+          <h2
+            className="mb-3 border-b pb-2 text-base font-bold uppercase"
+            style={{
+              color: selectedTemplate.headingColor,
+              borderColor: selectedTemplate.accent,
+            }}
+          >
+            {heading(GROUPS[0])}
+          </h2>
+
+          <div className="flex items-start gap-4">
+            <div className="min-w-0 flex-1">
+              {renderRows(personalRows)}
+            </div>
+
+            <div
+              className="shrink-0 rounded-lg border p-1"
+              style={{ borderColor: selectedTemplate.border }}
+            >
+              {renderPhoto("h-[150px] w-[120px] rounded object-cover")}
+            </div>
+          </div>
+        </section>
+
+        {familyRows.length > 0 && (
+          <section>
+            <h2
+              className="mb-3 border-b pb-2 text-base font-bold uppercase"
+              style={{
+                color: selectedTemplate.headingColor,
+                borderColor: selectedTemplate.accent,
+              }}
+            >
+              {heading(GROUPS[1])}
+            </h2>
+
+            {renderRows(familyRows)}
+          </section>
+        )}
+
+        {contactRows.length > 0 && (
+          <section>
+            <h2
+              className="mb-3 border-b pb-2 text-base font-bold uppercase"
+              style={{
+                color: selectedTemplate.headingColor,
+                borderColor: selectedTemplate.accent,
+              }}
+            >
+              {heading(GROUPS[2])}
+            </h2>
+
+            {renderRows(contactRows)}
+          </section>
+        )}
+
+        {view.about.trim() && (
+          <section>
+            <h2
+              className="mb-2 border-b pb-2 font-bold uppercase"
+              style={{ color: selectedTemplate.headingColor }}
+            >
+              {t.aboutHeading}
+            </h2>
+
+            <p className="whitespace-pre-wrap text-sm leading-relaxed">
+              {view.about}
+            </p>
+          </section>
+        )}
+
+        {view.partner.trim() && (
+          <section>
+            <h2
+              className="mb-2 border-b pb-2 font-bold uppercase"
+              style={{ color: selectedTemplate.headingColor }}
+            >
+              {t.partnerHeading}
+            </h2>
+
+            <p className="whitespace-pre-wrap text-sm leading-relaxed">
+              {view.partner}
+            </p>
+          </section>
+        )}
+      </div>
+
+      <div
+        className="absolute inset-x-0 bottom-7 text-center text-sm font-semibold"
+        style={{ color: selectedTemplate.accent }}
+      >
+        ✦ {t.shubh} ✦
+      </div>
+    </div>
+  );
+}
+  
+  
+
+  
+  
+  
 
   /* ------------------------------- Form Inputs ---------------------------------- */
 
@@ -1153,52 +1348,71 @@ export default function BiodataMaker() {
             </div>
 
             {/* Template Selector Grid */}
-            <div className="mt-6">
-              <h3 className="mb-3 text-base font-bold">{t.choose}</h3>
-              <div className="-mx-1 flex snap-x gap-3 overflow-x-auto px-1 pb-2">
-                {templates.map((item) => {
-                  const active = template === item.id;
-                  const nameLabel =
-                    ORNATE_NAMES[item.id]?.[language] ??
-                    (t.templateNames as Record<string, string>)[item.id] ??
-                    item.id;
-                  return (
-                    <button
-                      type="button"
-                      key={item.id}
-                      onClick={() => setTemplate(item.id)}
-                      aria-pressed={active}
-                      className={`relative w-28 shrink-0 snap-start rounded-xl border-2 p-2 text-left transition ${
-                        active
-                          ? "border-orange-500 bg-orange-50 shadow-md"
-                          : "border-stone-200 bg-white hover:border-orange-300"
-                      }`}
-                    >
-                      <div className="flex aspect-[3/4] items-center justify-center rounded-lg bg-stone-100 p-2">
-                        <div
-                          className="flex h-full w-full flex-col items-center border-4 bg-white p-1.5"
-                          style={{ borderColor: item.color, background: item.bg ?? "#fff" }}
-                        >
-                          <div className="mb-2 h-1.5 w-3/4 rounded-full" style={{ backgroundColor: item.color }} />
-                          <div className="mb-2 h-6 w-6 rounded-full border border-stone-200 bg-stone-100" />
-                          <div className="w-full space-y-1.5">
-                            <div className="h-1 w-full rounded bg-stone-200" />
-                            <div className="h-1 w-4/5 rounded bg-stone-200" />
-                            <div className="h-1 w-full rounded bg-stone-200" />
-                          </div>
-                        </div>
-                      </div>
-                      {active && (
-                        <span className="absolute right-1.5 top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-orange-500 text-xs font-bold text-white">
-                          ✓
-                        </span>
-                      )}
-                      <p className="mt-2 text-xs font-bold leading-tight">{nameLabel}</p>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
+             
+             
+             
+             
+             
+             
+             
+             
+             
+             
+             
+             
+             
+             
+             
+             
+             {/* Template Selector Grid */}
+<div className="mt-6">
+  <h3 className="mb-3 text-base font-bold">{t.choose}</h3>
+  <div className="grid grid-cols-2 gap-2 max-h-80 overflow-y-auto pr-1">
+    {BIODATA_TEMPLATES.map((t) => (
+      <button
+        key={t.id}
+        type="button"
+        onClick={() => setTemplate(t.id)}
+        className={`p-3 text-sm font-semibold rounded-lg border transition ${
+          template === t.id 
+            ? "border-orange-600 bg-orange-50 text-orange-900 shadow-sm" 
+            : "border-stone-200 bg-white hover:border-orange-300"
+        }`}
+      >
+        {t.name}
+      </button>
+    ))}
+  </div>
+</div>
+             
+             
+             
+             
+             
+             
+             
+             
+             
+             
+             
+             
+             
+             
+             
+             
+             
+             
+             
+             
+             
+             
+             
+             
+             
+            
+            
+            
+            
 
             {/* Photo Upload */}
             <div className="mt-6">
