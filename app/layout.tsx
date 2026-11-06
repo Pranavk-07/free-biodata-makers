@@ -1,4 +1,5 @@
- import Script from "next/script";
+ 
+import Script from "next/script";
 import Navbar from "./components/Navbar";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
@@ -14,9 +15,6 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
- 
- 
- 
 export const metadata: Metadata = {
   metadataBase: new URL("https://freebiodatamakers.com"),
 
@@ -44,10 +42,6 @@ export const metadata: Metadata = {
 
   authors: [{ name: "Free Biodata Makers" }],
 
-   
-   
-   
-
   robots: {
     index: true,
     follow: true,
@@ -71,33 +65,7 @@ export const metadata: Metadata = {
   },
 };
 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- export default function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -108,10 +76,18 @@ export const metadata: Metadata = {
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <head>
-        {/* Paste your Measurement ID below where it says YOUR_MEASUREMENT_ID */}
+        {/* Google AdSense verification and ad script */}
+        <Script
+          async
+          strategy="beforeInteractive"
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3536833412291783"
+          crossOrigin="anonymous"
+        />
+
+        {/* Google Analytics */}
         <Script
           strategy="afterInteractive"
-          src={`https://www.googletagmanager.com/gtag/js?id=G-H5LDC8WEYF`}
+          src="https://www.googletagmanager.com/gtag/js?id=G-H5LDC8WEYF"
         />
         <Script id="google-analytics" strategy="afterInteractive">
           {`
@@ -129,23 +105,3 @@ export const metadata: Metadata = {
     </html>
   );
 }
- 
-
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
